@@ -130,24 +130,28 @@ namespace DBWireup
             {
                 if (property.Name != "ID")
                 {
-                    // Id is already there in the template
+                    // ID is already there in the template
                     bizProperties += $"public {property.Type} {property.Name}\n" +
                                      $"{{\n" +
                                      $"    get {{ return _EntityDAL.{property.Name};  }}\n" +
                                      $"    set {{ _EntityDAL.{property.Name} = value;  }}\n" +
                                      $"}}\n";
 
-                    // Id doesn't have a setter
+                    // ID doesn't have a setter
                     createNewParams.Add($"{property.Type} {property.Name.ToLower()}");
                     createNewPropertySetters.Add($"entity.{property.Name} = {property.Name.ToLower()};");
                 }
 
-                Template paramFunction = GetNewTemplate(NetFrameworkTemplates["BizParamFunction"], entity);
-                paramFunction.Add("BIZCLASSNAME", entity.Name);
-                paramFunction.Add("FKPROPERTYNAME", char.ToUpper(property.Name[0]) + property.Name.Substring(1));
-                paramFunction.Add("FKIDTYPE", property.Type);
+                // This is only for foreign keys!!
+                if (property.IsForeignKey)
+                {
+                    Template paramFunction = GetNewTemplate(NetFrameworkTemplates["BizGetByFK"], entity);
+                    paramFunction.Add("BIZCLASSNAME", entity.Name);
+                    paramFunction.Add("FKPROPERTYNAME", char.ToUpper(property.Name[0]) + property.Name.Substring(1));
+                    paramFunction.Add("FKIDTYPE", property.Type);
 
-                paramFunctions.Add(paramFunction.Render());
+                    paramFunctions.Add(paramFunction.Render());
+                }
             }
 
             Template template = GetNewTemplate(NetFrameworkTemplates["Biz"], entity);

@@ -104,11 +104,9 @@ namespace SetupCommon
                 string propertyName = property.Attributes["name"].Value;
                 string propertyType = property.Attributes["type"].Value;
                 string propertySqlType = property.Attributes["sqlType"].Value;
-                bool fetchableBy = property.Attributes["fetchableBy"] != null ? bool.Parse(property.Attributes["fetchableBy"].Value) : false;
-                bool deletableBy = property.Attributes["deletableBy"] != null ? bool.Parse(property.Attributes["deletableBy"].Value) : false;
                 bool isNullable = propertyType.EndsWith("?");
 
-                properties.Add(new Property() { Name = propertyName, Type = propertyType, SqlType = propertySqlType, FetchableBy = fetchableBy, DeletableBy = deletableBy, IsNullable = isNullable });
+                properties.Add(new Property() { Name = propertyName, Type = propertyType, SqlType = propertySqlType, IsNullable = isNullable });
             }
 
             return new Entity() {

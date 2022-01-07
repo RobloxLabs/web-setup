@@ -25,21 +25,13 @@ namespace SetupCommon
         public string SqlType { get; set; }
 
         /// <summary>
-        /// Whether or not to generate a GetBy<see cref="Name" /> method and SQL procedure for the containing entity.
-        /// False if <see cref="IsIdentity" /> is true.
+        /// Whether or not to generate a GetByFK method and SQL procedure for the containing entity.
         /// </summary>
         [DefaultValue(false)]
-        public bool FetchableBy { get; set; }
-
-        /// <summary>
-        /// Whether or not to generate a DeleteBy<see cref="Name" /> method and SQL procedure for the containing entity.
-        /// </summary>
-        [DefaultValue(false)]
-        public bool DeletableBy { get; set; }
+        public bool IsForeignKey { get; set; }
 
         /// <summary>
         /// Whether or not the property value is nullable.
-        /// False if <see cref="IsIdentity" /> is true.
         /// </summary>
         [DefaultValue(false)]
         public bool IsNullable { get; set; }
@@ -56,8 +48,7 @@ namespace SetupCommon
             Name = reader.GetAttribute("Name");
             Type = reader.GetAttribute("Type");
             SqlType = reader.GetAttribute("SqlType");
-            FetchableBy = SchemaHelper.ReadXmlAttributeBool(reader, "FetchableBy");
-            DeletableBy = SchemaHelper.ReadXmlAttributeBool(reader, "DeletableBy");
+            IsForeignKey = SchemaHelper.ReadXmlAttributeBool(reader, "IsForeignKey");
             IsNullable = Type.EndsWith("?");
         }
 
@@ -66,10 +57,8 @@ namespace SetupCommon
             writer.WriteAttributeString("Name", Name);
             writer.WriteAttributeString("Type", Type);
             writer.WriteAttributeString("SqlType", SqlType);
-            if (FetchableBy)
-                writer.WriteAttributeString("FetchableBy", FetchableBy.ToString());
-            if (DeletableBy)
-                writer.WriteAttributeString("DeletableBy", DeletableBy.ToString());
+            if (IsForeignKey)
+                writer.WriteAttributeString("IsForeignKey", IsForeignKey.ToString());
         }
 
         #endregion
