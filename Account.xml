@@ -1,0 +1,7 @@
+<?xml version='1.0' standalone='yes'?>
+<entity name="Account" namespace="Roblox" table="Accounts" idType="int" mysqlIdType="INT" internal="false">
+  <property name="Name" type="string" mysqlType="VARCHAR(20)" mssqlType="VARCHAR(20)" nullable="false" />
+  <property name="Description" type="string" mysqlType="VARCHAR(256)" mssqlType="VARCHAR(256)" nullable="false" />
+  <property name="AccountStatusID" type="byte" mysqlType="TINYINT" mssqlType="TINYINT" nullable="false" />
+  <property name="RoleSetID" type="int" mysqlType="INT" mssqlType="INT" nullable="false" />
+</entity>

@@ -1,0 +1,193 @@
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using Dapper;
+using Polly;
+using Polly.CircuitBreaker;
+using Polly.Retry;
+using Polly.Timeout;
+using Polly.Wrap;
+using Prometheus;
+using Roblox.LightUtils;
+
+namespace ~REPOSITORYNAMESPACE~
+{
+	public class ~REPOSITORYNAME~
+	{
+		private IDbConnection _Connection
+		{
+			get
+			{
+				return new SqlConnection(this._Settings.MSSQLConnectionString);
+			}
+		}
+
+		public ~REPOSITORYNAME~(I~REPOSITORYNAME~Settings settings, ITelemetry telemetry)
+		{
+			if (settings == null)
+			{
+				throw new ArgumentNullException("settings");
+			}
+			this._Settings = settings;
+			if (telemetry == null)
+			{
+				throw new ArgumentNullException("telemetry");
+			}
+			this._Telemetry = telemetry;
+			this.InitializePolly(settings);
+			this.InitializeCache(settings);
+		}
+
+		~ENTITYFUNCTIONS~
+
+		private void InitializeCache(I~REPOSITORYNAME~Settings settings)
+		{
+			~REPOSITORYNAME~.CacheTelemetry cacheTelemetry = new ~REPOSITORYNAME~.CacheTelemetry();
+			this._ClaimTypeCache = new ~REPOSITORYNAME~.ClaimTypeCache(cacheTelemetry);
+			this._ClaimCache = new ~REPOSITORYNAME~.ClaimCache(cacheTelemetry, settings.ClaimCacheSecondsToLive, settings.ClaimCacheMaxSize);
+			this._PrincipalCache = new ~REPOSITORYNAME~.PrincipalCache(cacheTelemetry, settings.PrincipalCacheSecondsToLive, settings.PrincipalCacheMaxSize);
+			this._SessionCache = new ~REPOSITORYNAME~.SessionCache(cacheTelemetry, settings.SessionCacheSecondsToLive, settings.SessionCacheMaxSize);
+		}
+
+		private void InitializePolly(I~REPOSITORYNAME~Settings settings)
+		{
+			AsyncCircuitBreakerPolicy breaker = Policy.Handle<SqlException>((SqlException ex) => ex.Number != 2601).Or<TimeoutRejectedException>().AdvancedCircuitBreakerAsync((double)settings.MSSQLCircuitBreakerFailureThreshold, TimeSpan.FromSeconds((double)settings.MSSQLCircuitBreakerEvaluationSeconds), settings.MSSQLCircuitBreakerMinimumInvocations, TimeSpan.FromSeconds((double)settings.MSSQLCircuitBreakerTimeoutSeconds), delegate(Exception ex, TimeSpan time, Context context)
+			{
+				this._CircuitBreakerGauge.WithLabels(new string[]
+				{
+					"~REPOSITORYNAME~"
+				}).Set(1.0);
+			}, delegate(Context context)
+			{
+				this._CircuitBreakerGauge.WithLabels(new string[]
+				{
+					"~REPOSITORYNAME~"
+				}).Set(0.0);
+			}, delegate()
+			{
+				this._CircuitBreakerGauge.WithLabels(new string[]
+				{
+					"~REPOSITORYNAME~"
+				}).Set(0.5);
+			});
+			AsyncTimeoutPolicy timeout = Policy.TimeoutAsync(TimeSpan.FromMilliseconds((double)settings.MSSQLNetworkTimeoutMilliseconds), TimeoutStrategy.Pessimistic, delegate(Context context, TimeSpan time, Task task, Exception ex)
+			{
+				this._TimeoutCounter.WithLabels(new string[]
+				{
+					"~REPOSITORYNAME~",
+					(string)context["storedProcedure"]
+				}).Inc(1.0);
+				return Task.CompletedTask;
+			});
+			AsyncRetryPolicy retry = Policy.Handle<SqlException>((SqlException ex) => ex.Number != 2601).RetryAsync(delegate(Exception ex, int attempt, Context context)
+			{
+				this._RetryCounter.WithLabels(new string[]
+				{
+					"~REPOSITORYNAME~",
+					(string)context["storedProcedure"]
+				}).Inc(1.0);
+			});
+			this._Policy = Policy.WrapAsync(new IAsyncPolicy[]
+			{
+				timeout,
+				retry,
+				breaker
+			});
+		}
+
+		private async Task<T> QueryFirstOrDefaultAsync<T>(IDbConnection connection, string storedProcedure, object p)
+		{
+			return await _Policy.ExecuteAsync<T>((Func<Context, Task<T>>) (async (Context context) => await _Telemetry.Wrap("~REPOSITORYNAME~", storedProcedure, async () => await SqlMapper.QueryFirstOrDefaultAsync<T>(connection, storedProcedure, p, (IDbTransaction) null, (int?) null, (CommandType?) CommandType.StoredProcedure))), new Dictionary<string, object> { { "storedProcedure", storedProcedure } });
+		}
+
+		private async Task QueryAsync(IDbConnection connection, string storedProcedure, object p)
+		{
+			await _Policy.ExecuteAsync<IEnumerable<object>>((Func<Context, Task<IEnumerable<object>>>) (async (Context context) => await _Telemetry.Wrap("~REPOSITORYNAME~", storedProcedure, async () => await SqlMapper.QueryAsync(connection, storedProcedure, p, (IDbTransaction) null, (int?) null, (CommandType?) CommandType.StoredProcedure))), new Dictionary<string, object> { { "storedProcedure", storedProcedure } });
+		}
+
+		private async Task<int> ExecuteAsync(IDbConnection connection, string storedProcedure, object p)
+		{
+			return await _Policy.ExecuteAsync<int>((Func<Context, Task<int>>) (async (Context context) => await _Telemetry.Wrap("~REPOSITORYNAME~", storedProcedure, async () => await SqlMapper.ExecuteAsync(connection, storedProcedure, p, (IDbTransaction) null, (int?) null, (CommandType?) CommandType.StoredProcedure))), new Dictionary<string, object> { { "storedProcedure", storedProcedure } });
+		}
+
+		private readonly I~REPOSITORYNAME~Settings _Settings;
+
+		private ~REPOSITORYNAME~.ClaimTypeCache _ClaimTypeCache;
+
+		private ~REPOSITORYNAME~.ClaimCache _ClaimCache;
+
+		private ~REPOSITORYNAME~.PrincipalCache _PrincipalCache;
+
+		private ~REPOSITORYNAME~.SessionCache _SessionCache;
+
+		private const string _RepositoryName = "~REPOSITORYNAME~";
+
+		private AsyncPolicyWrap _Policy;
+
+		private readonly ITelemetry _Telemetry;
+
+		private readonly Counter _TimeoutCounter = Metrics.CreateCounter("sql_timeouts", "Timeouts on calls to sql", new string[]
+		{
+			"Database",
+			"StoredProcedure"
+		});
+
+		private readonly Counter _RetryCounter = Metrics.CreateCounter("sql_retries", "Retries on calls to sql", new string[]
+		{
+			"Database",
+			"StoredProcedure"
+		});
+
+		private readonly Gauge _CircuitBreakerGauge = Metrics.CreateGauge("sql_circuitbreaker_state", "State of the sql circuit breaker", new string[]
+		{
+			"Database"
+		});
+
+		private const int _SqlDuplicateKeyError = 2601;
+
+		private class CacheTelemetry
+		{
+			public readonly Counter AttemptCounter = Metrics.CreateCounter("cache_attempts", "Total calls to the cache", new string[]
+			{
+				"Database",
+				"Entity"
+			});
+
+			public readonly Counter MissCounter = Metrics.CreateCounter("cache_miss", "Calls to the cache that do not retrieve a record", new string[]
+			{
+				"Database",
+				"Entity"
+			});
+
+			public readonly Counter HitCounter = Metrics.CreateCounter("cache_hits", "Calls to the cache that retrieve a record", new string[]
+			{
+				"Database",
+				"Entity"
+			});
+
+			public readonly Counter AddCounter = Metrics.CreateCounter("cache_additions", "Calls to the cache that add a record", new string[]
+			{
+				"Database",
+				"Entity"
+			});
+
+			public readonly Counter EvictionCounter = Metrics.CreateCounter("cache_evictions", "Calls to the cache that evict a record", new string[]
+			{
+				"Database",
+				"Entity"
+			});
+
+			public readonly Counter EarlyEvictionCounter = Metrics.CreateCounter("cache_evictions_early", "Calls to the cache that evict a record before it has expired", new string[]
+			{
+				"Database",
+				"Entity"
+			});
+		}
+
+		~ENTITYCACHES~
+	}
+}

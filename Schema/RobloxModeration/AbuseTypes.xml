@@ -1,0 +1,5 @@
+<?xml version='1.0' standalone='yes'?>
+<entity name="AbuseType" namespace="Roblox" table="AbuseTypes" internal="false" cacheType="Timed" idType="Byte" sqlIdType="tinyint">
+  <property name="Name" type="String" sqlType="nvarchar(50)" fetchableBy="true" deletableBy="true" />
+  <property name="AccountStateTypeID" type="Byte" sqlType="TinyInt" fetchableBy="true" deletableBy="true" />
+</entity>

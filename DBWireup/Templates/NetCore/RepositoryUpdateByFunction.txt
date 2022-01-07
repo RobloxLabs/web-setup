@@ -1,0 +1,15 @@
+﻿public async Task<int> Sessions_UpdateExpirationUtcByToken(Guid token, DateTime expiration)
+{
+	int result;
+	using (IDbConnection connection = this._Connection)
+	{
+		connection.Open();
+		int num = await this.ExecuteAsync(connection, "Sessions_UpdateExpirationUtcByToken", new
+		{
+			Token = token,
+			ExpirationUtc = expiration
+		});
+		result = num;
+	}
+	return result;
+}

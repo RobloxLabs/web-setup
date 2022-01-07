@@ -1,0 +1,5 @@
+<?xml version='1.0' standalone='yes'?>
+<entity name="RoleSet" namespace="Roblox" table="RoleSets" internal="false" idType="int" sqlIdType="Int">
+  <property name="Name" type="string" sqlType="VARCHAR(32)" fetchableBy="true" delatableBy="true" />
+  <property name="Roles" type="string" sqlType="VARCHAR(512)" fetchableBy="true" delatableBy="true" />
+</entity>

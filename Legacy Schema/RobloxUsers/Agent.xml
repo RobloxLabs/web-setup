@@ -1,0 +1,5 @@
+<?xml version='1.0' standalone='yes'?>
+<entity name="Agent" namespace="Roblox" table="Agents" internal="false" cacheType="Timed" idType="int" sqlIdType="Int" idAutoIncrement="true">
+  <property name="AssociatedEntityID" type="int" sqlType="INT" fetchableBy="true" delatableBy="true" />
+  <property name="AssociatedEntityTypeID" type="byte" sqlType="TINYINT" fetchableBy="true" delatableBy="true" />
+</entity>

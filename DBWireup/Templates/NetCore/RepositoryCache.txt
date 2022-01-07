@@ -1,0 +1,92 @@
+﻿private class ClaimTypeCache
+{
+	public ClaimTypeCache(<REPOSITORYNAME>.CacheTelemetry telemetry)
+	{
+		if (telemetry == null)
+		{
+			throw new ArgumentNullException("telemetry");
+		}
+		this._Telemetry = telemetry;
+	}
+
+	public ClaimType GetByID(int id)
+	{
+		this._Telemetry.AttemptCounter.WithLabels(new string[]
+		{
+			"<REPOSITORYNAME>",
+			"ClaimType"
+		}).Inc(1.0);
+		ClaimType claimType;
+		if (this._IDCache.TryGetValue(id, out claimType))
+		{
+			this._Telemetry.HitCounter.WithLabels(new string[]
+			{
+				"<REPOSITORYNAME>",
+				"ClaimType"
+			}).Inc(1.0);
+			return claimType;
+		}
+		this._Telemetry.MissCounter.WithLabels(new string[]
+		{
+			"<REPOSITORYNAME>",
+			"ClaimType"
+		}).Inc(1.0);
+		return null;
+	}
+
+	public ClaimType GetByValue(string value)
+	{
+		this._Telemetry.AttemptCounter.WithLabels(new string[]
+		{
+			"<REPOSITORYNAME>",
+			"ClaimType"
+		}).Inc(1.0);
+		ClaimType claimType;
+		if (this._ValueCache.TryGetValue(value, out claimType))
+		{
+			this._Telemetry.HitCounter.WithLabels(new string[]
+			{
+				"<REPOSITORYNAME>",
+				"ClaimType"
+			}).Inc(1.0);
+			return claimType;
+		}
+		this._Telemetry.MissCounter.WithLabels(new string[]
+		{
+			"<REPOSITORYNAME>",
+			"ClaimType"
+		}).Inc(1.0);
+		return null;
+	}
+
+	public void Add(ClaimType claimType)
+	{
+		if (!this._IDCache.ContainsKey(claimType.ID))
+		{
+			object writeLock = this._WriteLock;
+			lock (writeLock)
+			{
+				if (!this._IDCache.ContainsKey(claimType.ID))
+				{
+					this._IDCache.Add(claimType.ID, claimType);
+					this._ValueCache.Add(claimType.Value, claimType);
+					this._Telemetry.AddCounter.WithLabels(new string[]
+					{
+						"<REPOSITORYNAME>",
+						"ClaimType"
+					}).Inc(1.0);
+				}
+			}
+		}
+	}
+
+	private readonly object _WriteLock = new object();
+
+	private const string _EntityName = "ClaimType";
+
+	private readonly IDictionary<int, ClaimType> _IDCache = new Dictionary<int, ClaimType>();
+
+	private readonly IDictionary<string, ClaimType> _ValueCache = new Dictionary<string, ClaimType>();
+
+	private readonly <REPOSITORYNAME>.CacheTelemetry _Telemetry;
+}

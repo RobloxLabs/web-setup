@@ -1,0 +1,28 @@
+﻿public async Task<ClaimType> ClaimTypes_GetOrCreate(string value)
+{
+	ClaimType claimType = this._ClaimTypeCache.GetByValue(value);
+	ClaimType result;
+	if (claimType != null)
+	{
+		result = claimType;
+	}
+	else
+	{
+		using (IDbConnection connection = this._Connection)
+		{
+			DynamicParameters p = new DynamicParameters();
+			p.Add("CreatedNewEntity", null, new DbType?(DbType.Boolean), new ParameterDirection?(ParameterDirection.Output), null, null, null);
+			p.Add("Value", value, null, null, null, null, null);
+			connection.Open();
+			ClaimType claimType2 = await this.QueryFirstOrDefaultAsync<ClaimType>(connection, "ClaimTypes_GetOrCreate", p);
+			claimType = claimType2;
+			if (claimType == null)
+			{
+				throw new Exception("Failed to create ClaimType");
+			}
+			this._ClaimTypeCache.Add(claimType);
+			result = claimType;
+		}
+	}
+	return result;
+}

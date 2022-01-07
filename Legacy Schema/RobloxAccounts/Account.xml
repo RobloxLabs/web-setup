@@ -1,0 +1,7 @@
+<?xml version='1.0' standalone='yes'?>
+<entity name="Account" namespace="Roblox" table="Accounts" internal="false" cacheType="Timed" idType="int" sqlIdType="Int" idAutoIncrement="true">
+  <property name="Name" type="string" sqlType="VARCHAR(20)" fetchableBy="true" delatableBy="true" />
+  <property name="Description" type="string" sqlType="VARCHAR(256)" fetchableBy="true" delatableBy="true" />
+  <property name="AccountStatusID" type="byte" sqlType="TINYINT" fetchableBy="true" delatableBy="true" />
+  <property name="RoleSetID" type="int" sqlType="INT" fetchableBy="true" delatableBy="true" />
+</entity>

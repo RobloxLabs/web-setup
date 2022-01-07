@@ -1,0 +1,15 @@
+﻿public async Task<int> Claims_DeleteByClaimTypeIDClaimTargetID(int claimTypeID, string claimTargetID)
+{
+	int result;
+	using (IDbConnection connection = this._Connection)
+	{
+		connection.Open();
+		int num = await this.ExecuteAsync(connection, "Claims_DeleteByClaimTypeIDClaimTargetID", new
+		{
+			ClaimTypeID = claimTypeID,
+			ClaimTargetID = claimTargetID
+		});
+		result = num;
+	}
+	return result;
+}

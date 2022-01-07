@@ -1,0 +1,4 @@
+<?xml version='1.0' standalone='yes'?>
+<entity name="" namespace="" table="" internal="false" cacheType="Timed" idType="long" sqlIdType="BigInt">
+  <property name="NumberThing" type="long" sqlType="BIGINT" fetchableBy="true" delatableBy="true" />
+</entity>

@@ -1,0 +1,5 @@
+<?xml version='1.0' standalone='yes'?>
+<config>
+  <repositoryName>AsdRepository</repositoryName> <!-- If not present no .NET Core repository will be generated -->
+  <repositoryNamespace>Roblox.Asd</repositoryNamespace> <!--  -->
+</config>

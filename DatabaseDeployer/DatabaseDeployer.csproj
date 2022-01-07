@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net451</TargetFramework>
+  </PropertyGroup>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="xcopy /E /I /Y $(SolutionDir)Schema $(OutDir)Schema&#xD;&#xA;xcopy /E /I /Y $(ProjectDir)Templates $(OutDir)Templates&#xD;&#xA;copy /Y $(ProjectDir)config.json $(OutDir)" />
+  </Target>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="StringTemplate4" Version="4.0.8" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SetupCommon\SetupCommon.csproj" />
+  </ItemGroup>
+
+</Project>

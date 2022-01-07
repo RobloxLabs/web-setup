@@ -1,0 +1,142 @@
+﻿private class ClaimCache
+{
+	public ClaimCache(<REPOSITORYNAME>.CacheTelemetry telemetry, int secondsToLive, int maxCachedItems)
+	{
+		if (secondsToLive <= 0)
+		{
+			throw new ArgumentOutOfRangeException("secondsToLive");
+		}
+		if (maxCachedItems <= 0)
+		{
+			throw new ArgumentOutOfRangeException("maxCachedItems");
+		}
+		if (telemetry == null)
+		{
+			throw new ArgumentNullException("telemetry");
+		}
+		this._Telemetry = telemetry;
+		this._CacheTTL = TimeSpan.FromSeconds((double)secondsToLive);
+		this._MaxCachedItems = maxCachedItems;
+	}
+
+	public Claim GetByPrincipalID(long principalId)
+	{
+		this._Telemetry.AttemptCounter.WithLabels(new string[]
+		{
+			"<REPOSITORYNAME>",
+			"Claim"
+		}).Inc(1.0);
+		ValueTuple<Claim, DateTime> claim;
+		if (this._PrincipalIDCache.TryGetValue(principalId, out claim))
+		{
+			if (claim.Item2 > DateTime.UtcNow)
+			{
+				this._Telemetry.HitCounter.WithLabels(new string[]
+				{
+					"<REPOSITORYNAME>",
+					"Claim"
+				}).Inc(1.0);
+				return claim.Item1;
+			}
+			this.Remove(claim.Item1);
+		}
+		this._Telemetry.MissCounter.WithLabels(new string[]
+		{
+			"<REPOSITORYNAME>",
+			"Claim"
+		}).Inc(1.0);
+		return null;
+	}
+
+	public Claim GetByLookup(int claimTypeID, string claimTargetID)
+	{
+		this._Telemetry.AttemptCounter.WithLabels(new string[]
+		{
+			"<REPOSITORYNAME>",
+			"Claim"
+		}).Inc(1.0);
+		ValueTuple<Claim, DateTime> claim;
+		if (this._LookupCache.TryGetValue(this.BuildLookupCacheKey(claimTypeID, claimTargetID), out claim))
+		{
+			if (claim.Item2 > DateTime.UtcNow)
+			{
+				this._Telemetry.HitCounter.WithLabels(new string[]
+				{
+					"<REPOSITORYNAME>",
+					"Claim"
+				}).Inc(1.0);
+				return claim.Item1;
+			}
+			this.Remove(claim.Item1);
+		}
+		this._Telemetry.MissCounter.WithLabels(new string[]
+		{
+			"<REPOSITORYNAME>",
+			"Claim"
+		}).Inc(1.0);
+		return null;
+	}
+
+	public void Add(Claim claim)
+	{
+		while (this._PrincipalIDCache.Count >= this._MaxCachedItems && !this._EvictionQueue.IsEmpty)
+		{
+			ValueTuple<Claim, DateTime> evictedClaim;
+			while (this._EvictionQueue.TryDequeue(out evictedClaim) && !this.Remove(evictedClaim.Item1))
+			{
+			}
+			if (evictedClaim.Item2 <= DateTime.UtcNow)
+			{
+				this._Telemetry.EarlyEvictionCounter.WithLabels(new string[]
+				{
+					"<REPOSITORYNAME>",
+					"Claim"
+				}).Inc(1.0);
+			}
+		}
+		DateTime expiry = DateTime.UtcNow + this._CacheTTL;
+		this._PrincipalIDCache.AddOrUpdate(claim.PrincipalID, new ValueTuple<Claim, DateTime>(claim, expiry), (long k, ValueTuple<Claim, DateTime> v) => new ValueTuple<Claim, DateTime>(claim, expiry));
+		this._LookupCache.AddOrUpdate(this.BuildLookupCacheKey(claim.ClaimTypeID, claim.ClaimTargetID), new ValueTuple<Claim, DateTime>(claim, expiry), (string k, ValueTuple<Claim, DateTime> v) => new ValueTuple<Claim, DateTime>(claim, expiry));
+		this._EvictionQueue.Enqueue(new ValueTuple<Claim, DateTime>(claim, expiry));
+		this._Telemetry.AddCounter.WithLabels(new string[]
+		{
+			"<REPOSITORYNAME>",
+			"Claim"
+		}).Inc(1.0);
+	}
+
+	public bool Remove(Claim claim)
+	{
+		ValueTuple<Claim, DateTime> valueTuple;
+		bool success = this._PrincipalIDCache.TryRemove(claim.PrincipalID, out valueTuple);
+		success &= this._LookupCache.TryRemove(this.BuildLookupCacheKey(claim.ClaimTypeID, claim.ClaimTargetID), out valueTuple);
+		if (success)
+		{
+			this._Telemetry.EvictionCounter.WithLabels(new string[]
+			{
+				"<REPOSITORYNAME>",
+				"Claim"
+			}).Inc(1.0);
+		}
+		return success;
+	}
+
+	private string BuildLookupCacheKey(int claimTypeID, string claimTargetID)
+	{
+		return string.Format("{0}_{1}", claimTypeID, claimTargetID);
+	}
+
+	private const string _EntityName = "Claim";
+
+	private readonly ConcurrentDictionary<long, ValueTuple<Claim, DateTime>> _PrincipalIDCache = new ConcurrentDictionary<long, ValueTuple<Claim, DateTime>>();
+
+	private readonly ConcurrentDictionary<string, ValueTuple<Claim, DateTime>> _LookupCache = new ConcurrentDictionary<string, ValueTuple<Claim, DateTime>>();
+
+	private readonly ConcurrentQueue<ValueTuple<Claim, DateTime>> _EvictionQueue = new ConcurrentQueue<ValueTuple<Claim, DateTime>>();
+
+	private readonly <REPOSITORYNAME>.CacheTelemetry _Telemetry;
+
+	private readonly TimeSpan _CacheTTL;
+
+	private readonly int _MaxCachedItems;
+}

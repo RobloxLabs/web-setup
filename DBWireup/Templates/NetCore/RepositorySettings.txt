@@ -1,0 +1,42 @@
+﻿using System;
+
+namespace ~REPOSITORYNAMESPACE~
+{
+	/// <summary>
+	/// <see cref="T:~REPOSITORYNAMESPACE~.~REPOSITORYNAME~" />settings
+	/// </summary>
+	public interface I~REPOSITORYNAME~Settings
+	{
+		/// <summary>
+		/// Gets the connection string for MSSQL
+		/// </summary>
+		string MSSQLConnectionString { get; }
+
+		/// <summary>
+		/// Percentage (0.0-1.0) of requests that fail before tripping circuit breaker
+		/// </summary>
+		float MSSQLCircuitBreakerFailureThreshold { get; }
+
+		/// <summary>
+		/// Time interval to evaluate failure threshold for circuit breaker
+		/// </summary>
+		int MSSQLCircuitBreakerEvaluationSeconds { get; }
+
+		/// <summary>
+		/// Minimum number of invocations during time interval required to consider results significant
+		/// </summary>
+		int MSSQLCircuitBreakerMinimumInvocations { get; }
+
+		/// <summary>
+		/// Time to break circuit for when threshold crossed
+		/// </summary>
+		int MSSQLCircuitBreakerTimeoutSeconds { get; }
+
+		/// <summary>
+		/// Maximum time to wait for a response from MSSQL
+		/// </summary>
+		int MSSQLNetworkTimeoutMilliseconds { get; }
+
+		~ENTITYSETTINGS~
+	}
+}

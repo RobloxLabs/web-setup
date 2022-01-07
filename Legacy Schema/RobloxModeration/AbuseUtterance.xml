@@ -1,0 +1,9 @@
+<?xml version='1.0' standalone='yes'?>
+<entity name="AbuseUtterance" namespace="Roblox" table="AbuseUtterances" internal="false" cacheType="Timed" idType="Int" sqlIdType="Int">
+  <property name="UserID" type="Int" sqlType="Int" fetchableBy="true" deletableBy="true" />
+  <property name="Text" type="String" sqlType="NVarChar(1024)" fetchableBy="true" deletableBy="true" />
+  <property name="SourceType" type="Byte" sqlType="TinyInt" fetchableBy="true" deletableBy="true" />
+  <property name="Source" type="Int" sqlType="Int" fetchableBy="true" deletableBy="true" />
+  <property name="AbuseReportID" type="Int" sqlType="Int" fetchableBy="true" deletableBy="true" />
+  <property name="AbuseTypeID" type="Byte" sqlType="TinyInt" fetchableBy="true" deletableBy="true" />
+</entity>

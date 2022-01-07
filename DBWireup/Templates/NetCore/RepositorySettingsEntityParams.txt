@@ -1,0 +1,9 @@
+﻿/// <summary>
+/// How long should a ~TABLENAME~ live in the cache?
+/// </summary>
+int ~ENTITYNAME~CacheSecondsToLive { get; }
+
+/// <summary>
+/// How many ~TABLENAME~ should the cache hold?
+/// </summary>
+int ~ENTITYNAME~CacheMaxSize { get; }

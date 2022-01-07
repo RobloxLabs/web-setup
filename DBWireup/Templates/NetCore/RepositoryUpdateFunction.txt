@@ -1,0 +1,26 @@
+﻿public async Task<int> Principals_Update(long principalID, string salt, string altSalt)
+{
+	int result;
+	using (IDbConnection connection = this._Connection)
+	{
+		connection.Open();
+		int num = await this.ExecuteAsync(connection, "Principals_Update", new
+		{
+			ID = principalID,
+			Salt = salt,
+			AltSalt = altSalt
+		});
+		int affectedRows = num;
+		if (affectedRows > 0)
+		{
+			this._PrincipalCache.Add(new Principal
+			{
+				ID = principalID,
+				Salt = salt,
+				AltSalt = altSalt
+			});
+		}
+		result = affectedRows;
+	}
+	return result;
+}

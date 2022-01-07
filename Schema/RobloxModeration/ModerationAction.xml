@@ -1,0 +1,9 @@
+<?xml version='1.0' standalone='yes'?>
+<entity name="ModerationAction" namespace="Roblox" table="ModerationActions" internal="false" cacheType="Timed" idType="Int" sqlIdType="Int">
+  <property name="UserID" type="Int" sqlType="Int" fetchableBy="true" deletableBy="true" />
+  <property name="AccountStateTypeID" type="Byte" sqlType="TinyInt" fetchableBy="true" deletableBy="true" />
+  <property name="AbuseUtteranceID" type="Int" sqlType="Int" fetchableBy="true" deletableBy="true" />
+  <property name="AuthorID" type="Int" sqlType="Int" fetchableBy="true" deletableBy="true" />
+  <property name="Comment" type="String" sqlType="NVarChar(1024)" fetchableBy="true" deletableBy="true" />
+  <property name="ModeratorMessage" type="String" sqlType="NVarChar(256)" fetchableBy="true" deletableBy="true" />
+</entity>

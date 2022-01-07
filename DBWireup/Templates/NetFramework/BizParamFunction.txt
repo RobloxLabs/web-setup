@@ -1,0 +1,14 @@
+﻿~ACCESSIBILITY~ static ICollection<~BIZCLASSNAME~> Get~BIZCLASSNAME~sBy~FKPROPERTYNAME~(~FKIDTYPE~ ~FKPROPERTYNAME~)
+{
+    string collectionId = string.Format("Get~BIZCLASSNAME~sBy~FKPROPERTYNAME~_~FKPROPERTYNAME~:{0}", ~FKPROPERTYNAME~);
+    return EntityHelper.GetEntityCollection<~BIZCLASSNAME~, ~IDTYPE~>(
+        EntityCacheInfo,
+        new CacheManager.CachePolicy(
+            CacheManager.CacheScopeFilter.Qualified,
+            string.Format("~FKPROPERTYNAME~:{0}", ~FKPROPERTYNAME~)
+        ),
+        collectionId,
+        () => ~BIZCLASSNAME~DAL.Get~BIZCLASSNAME~IDsBy~FKPROPERTYNAME~(~FKPROPERTYNAME~),
+        Get
+    );
+}

@@ -1,0 +1,27 @@
+﻿public async Task<<ENTITYNAME>> <TABLENAME>_GetBy<PARAMETERNAME>(int <FETCHVARIABLENAME>)
+{
+	<ENTITYNAME> <ENTITYNAMELOWERCASE> = this._<CACHENAME>.GetBy<PARAMETERNAME>(<FETCHVARIABLENAME>);
+	<ENTITYNAME> result;
+	if (<ENTITYNAMELOWERCASE> != null)
+	{
+		result = <ENTITYNAMELOWERCASE>;
+	}
+	else
+	{
+		using (IDbConnection connection = this._Connection)
+		{
+			connection.Open();
+			<ENTITYNAME> <ENTITYNAMELOWERCASE>2 = await this.QueryFirstOrDefaultAsync<<ENTITYNAME>>(connection, "<TABLENAME>_GetBy<PARAMETERNAME>", new
+			{
+			<PARAMETERNAME> = <FETCHVARIABLENAME>
+			});
+			<ENTITYNAMELOWERCASE> = <ENTITYNAMELOWERCASE>2;
+			if (claimType != null)
+			{
+				this.<CACHENAME>.Add(<ENTITYNAMELOWERCASE>);
+			}
+			result = <ENTITYNAMELOWERCASE>;
+		}
+	}
+	return result;
+}

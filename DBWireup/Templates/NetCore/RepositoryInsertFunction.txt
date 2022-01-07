@@ -1,0 +1,28 @@
+﻿public async Task<Claim> Claims_Insert(long principalID, int claimTypeID, string claimTargetID)
+{
+	Claim result;
+	using (IDbConnection connection = this._Connection)
+	{
+		long claimID = 0L;
+		DynamicParameters p = new DynamicParameters();
+		p.Add("ID", claimID, new DbType?(DbType.Int64), new ParameterDirection?(ParameterDirection.Output), null, null, null);
+		p.Add("PrincipalID", principalID, null, null, null, null, null);
+		p.Add("ClaimTypeID", claimTypeID, null, null, null, null, null);
+		p.Add("ClaimTargetID", claimTargetID, null, null, null, null, null);
+		connection.Open();
+		await this.QueryAsync(connection, "Claims_Insert", p);
+		if (p.Get<long>("ID") == 0L)
+		{
+			throw new Exception("Failed to create Claim");
+		}
+		Claim claim = new Claim
+		{
+			PrincipalID = principalID,
+			ClaimTypeID = claimTypeID,
+			ClaimTargetID = claimTargetID
+		};
+		this._ClaimCache.Add(claim);
+		result = claim;
+	}
+	return result;
+}

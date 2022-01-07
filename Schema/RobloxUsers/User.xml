@@ -1,0 +1,26 @@
+<?xml version='1.0' standalone='yes'?>
+<entity name="User" namespace="Roblox" table="Users" internal="false" idType="int" sqlIdType="Int">
+  <property name="AccountID" type="int" sqlType="INT" fetchableBy="true" delatableBy="true" />
+  <property name="AgeBracket" type="AgeBracket" sqlType="TINYINT" fetchableBy="true" delatableBy="true" />
+  <property name="UseSuperSafeConversationMode" type="bool" sqlType="BIT" fetchableBy="true" delatableBy="true" />
+  <property name="UseSuperSafePrivacyMode" type="bool" sqlType="BIT" fetchableBy="true" delatableBy="true" />
+  <property name="ParentID" type="int?" sqlType="INT" fetchableBy="true" delatableBy="true" />
+  <property name="AgeBracketIsLocked" type="bool" sqlType="BIT" fetchableBy="true" delatableBy="true" />
+  <property name="ConversationSafetyModeIsLocked" type="bool" sqlType="BIT" fetchableBy="true" delatableBy="true" />
+  <property name="PrivacySafetyModeIsLocked" type="bool" sqlType="BIT" fetchableBy="true" delatableBy="true" />
+  <property name="AcquisitionTime" type="DateTime?" sqlType="DateTime" fetchableBy="true" delatableBy="true" />
+  <property name="AcquisitionMedium" type="string" sqlType="VARCHAR(20)" fetchableBy="true" delatableBy="true" />
+  <property name="AcquisitionSource" type="string" sqlType="VARCHAR(20)" fetchableBy="true" delatableBy="true" />
+  <property name="AcquisitionCampaign" type="string" sqlType="VARCHAR(20)" fetchableBy="true" delatableBy="true" />
+  <property name="AcquisitionReferrer" type="string" sqlType="VARCHAR(20)" fetchableBy="true" delatableBy="true" />
+  <!-- Should be added automatically by the User DAL -->
+  <!--property name="AssociatedEntityID" type="int?" sqlType="INT" fetchableBy="true" delatableBy="true" />
+  <property name="AssociatedEntityType" type="CreatorType" sqlType="TINYINT" fetchableBy="true" delatableBy="true" /-->
+  <!-- Name is fetched from account (GetAccount().Name) -->
+  <!--property name="Name" type="string" sqlType="VARCHAR(20)" fetchableBy="true" delatableBy="true" /-->
+  <!--property name="Description" type="string" sqlType="VARCHAR(256)" fetchableBy="false" delatableBy="false" /-->
+  <!--property name="DisplayName" type="string" sqlType="VARCHAR(20)" fetchableBy="true" delatableBy="true" /-->
+  <!--property name="AccountStatus" type="AccountStatus" sqlType="TINYINT" fetchableBy="true" delatableBy="true" /-->
+  <!--property name="Birthdate" type="DateTime" sqlType="DateTime" fetchableBy="true" delatableBy="true" /-->
+  <!--property name="GenderType" type="GenderType" sqlType="TINYINT" fetchableBy="true" delatableBy="true" /-->
+</entity>

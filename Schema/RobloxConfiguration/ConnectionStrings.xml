@@ -1,0 +1,7 @@
+<?xml version='1.0' standalone='yes'?>
+<entity name="ConnectionString" namespace="Roblox" table="ConnectionStrings" internal="false" cacheType="Timed" idType="int" sqlIdType="int" dated="false">
+  <property name="GroupName" type="string" sqlType="VARCHAR(256)" />
+  <property name="Name" type="string" sqlType="VARCHAR(256)" />
+  <property name="Value" type="string" sqlType="VARCHAR(MAX)" />
+  <property name="LastModified" type="DateTime" sqlType="DateTime" />
+</entity>
