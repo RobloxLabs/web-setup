@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
-<Entity Name="AccountStateType" IdType="Byte" SqlIdType="tinyint">
+<Entity Name="AbuseType" IdType="Byte" SqlIdType="tinyint">
   <Properties>
     <Property Name="Created" Type="DateTime" SqlType="DateTime" />
     <Property Name="Updated" Type="DateTime" SqlType="DateTime" />
     <Property Name="Name" Type="String" SqlType="nvarchar(50)" />
-    <Property Name="UserStatusID" Type="Byte" SqlType="tinyint" />
+    <Property Name="AccountStateTypeID" Type="Byte" SqlType="TinyInt" />
   </Properties>
 </Entity>

@@ -1,42 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 using System.Data.SqlClient;
-using Newtonsoft.Json;
 using SetupCommon;
 
 namespace DatabaseDeployer
 {
-    public class Deployer
+    /// <summary>
+    /// Creates databases, tables and columns based on the given entity schema.
+    /// </summary>
+    public class Deployer : WebSetupApplication<ApplicationSettings>
     {
-        public static void Run()
-        {
-            if (!File.Exists("config.json"))
-            {
-                Console.WriteLine("Config file does not exist");
-                return;
-            }
+        /// <summary>
+        /// The list of databases to deploy.
+        /// </summary>
+        private List<Database> DatabaseList { get; set; }
 
-            Config config = JsonConvert.DeserializeObject<Config>(File.ReadAllText("config.json"));
+        /// <summary>
+        /// Deploy databases to a designated Roblox database server.
+        /// </summary>
+        public void Deploy()
+        {
+            Console.WriteLine("Generating databases...");
 
             if (!Directory.Exists(SetupCommon.Properties.Settings.Default.SchemaDirectory))
-            {
-                Console.WriteLine("Schema directory does not exist");
-                return;
-            }
+                throw new DirectoryNotFoundException("Schema directory does not exist!");
 
             TemplateHelper.Setup();
+            DatabaseList = SchemaHelper.ReadSchemaDirectory(SetupCommon.Properties.Settings.Default.SchemaDirectory);
+            Console.WriteLine("Done!");
 
-            List<Database> databases = SchemaHelper.ReadSchemaDirectory(SetupCommon.Properties.Settings.Default.SchemaDirectory);
+            string masterConnectionString;
+            if (!Config.ConnectionStrings.TryGetValue("master", out masterConnectionString))
+                throw new ApplicationException("Unable to find master database connection string in ApplicationSettings");
 
-            using (SqlConnection connection = new SqlConnection(config.ConnectionString))
+            Console.WriteLine("Deploying databases...");
+            using (SqlConnection connection = new SqlConnection(masterConnectionString))
             {
                 connection.Open();
 
-                foreach (Database database in databases)
+                foreach (Database database in DatabaseList)
                 {
                     string databaseSql = TemplateHelper.FillDatabaseTemplate(database);
                     string tableSql = TemplateHelper.FillTablesTemplate(database);
@@ -51,11 +54,10 @@ namespace DatabaseDeployer
                         tableCommand.ExecuteNonQuery();
                     }
 
-                    Console.WriteLine($"Finished {database.Name}");
+                    Console.WriteLine($"Deployed {database.Name}");
                 }
-
-                Console.WriteLine($"Done! Generated {databases.Count} databases");
             }
+            Console.WriteLine($"Done! Generated and deployed {DatabaseList.Count} databases.");
         }
     }
 }

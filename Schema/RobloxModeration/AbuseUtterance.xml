@@ -1,9 +1,13 @@
-<?xml version='1.0' standalone='yes'?>
-<entity name="AbuseUtterance" namespace="Roblox" table="AbuseUtterances" internal="false" cacheType="Timed" idType="Int" sqlIdType="Int">
-  <property name="UserID" type="Int" sqlType="Int" fetchableBy="true" deletableBy="true" />
-  <property name="Text" type="String" sqlType="NVarChar(1024)" fetchableBy="true" deletableBy="true" />
-  <property name="SourceType" type="Byte" sqlType="TinyInt" fetchableBy="true" deletableBy="true" />
-  <property name="Source" type="Int" sqlType="Int" fetchableBy="true" deletableBy="true" />
-  <property name="AbuseReportID" type="Int" sqlType="Int" fetchableBy="true" deletableBy="true" />
-  <property name="AbuseTypeID" type="Byte" sqlType="TinyInt" fetchableBy="true" deletableBy="true" />
-</entity>
+<?xml version="1.0"?>
+<Entity Name="AbuseUtterance" IdType="Int">
+  <Properties>
+    <Property Name="Created" Type="DateTime" SqlType="DateTime" />
+    <Property Name="Updated" Type="DateTime" SqlType="DateTime" />
+    <Property Name="UserID" Type="Int" SqlType="Int" />
+    <Property Name="Text" Type="String" SqlType="NVarChar(1024)" />
+    <Property Name="SourceType" Type="Byte" SqlType="TinyInt" />
+    <Property Name="Source" Type="Int" SqlType="Int" />
+    <Property Name="AbuseReportID" Type="Int" SqlType="Int" />
+    <Property Name="AbuseTypeID" Type="Byte" SqlType="TinyInt" />
+  </Properties>
+</Entity>

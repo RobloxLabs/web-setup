@@ -1,110 +1,120 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
-//using System.Data.SqlClient;
 using Microsoft.Data.SqlClient;
-using Newtonsoft.Json;
 using Microsoft.SqlServer.Management.Smo;
 using Microsoft.SqlServer.Management.Common;
 using SetupCommon;
 
 namespace DBWireup
 {
-    public class Wirer
+    public class Wirer : WebSetupApplication<ApplicationSettings>
     {
-        public static void Run()
+        /// <summary>
+        /// A dictionary containing connection strings for wiring up SQL procedures.
+        /// </summary>
+        private Dictionary<string, string> ConnectionStrings { get; set; }
+
+        public void Wireup()
         {
-            if (!File.Exists("config.json"))
-            {
-                Console.WriteLine("Config file does not exist");
-                return;
-            }
+            if (!Directory.Exists(SetupCommon.Properties.Settings.Default.SchemaDirectory))
+                throw new DirectoryNotFoundException("Schema directory does not exist!");
 
-            Config config = JsonConvert.DeserializeObject<Config>(File.ReadAllText("config.json"));
-            Dictionary<string, string> connectionStrings = GetConnectionStrings(config);
-
-            if (!Directory.Exists("Schema"))
-            {
-                Console.WriteLine("Schema directory does not exist");
-                return;
-            }
+            // Do this at the beginning of the method to avoid doing unnecessary work in the event it fails.
+            // Fill the default connection string template with the required values.
+            string connectionStringTemplate = string.Format(Config.ConnectionStrings["Template"],
+                Config.DefaultDataSource,
+                Config.DefaultUserID,
+                Config.DefaultPassword);
 
             if (!Directory.Exists("Out"))
                 Directory.CreateDirectory("Out");
 
+            Console.WriteLine("Getting connection strings from database...");
+            ConnectionStrings = GetConnectionStrings();
+
+            Console.WriteLine("Setting up templates...");
             TemplateHelper.Setup();
 
+            Console.WriteLine("Reading database schema...");
             List<SetupCommon.Database> databases = SchemaHelper.ReadSchemaDirectory(SetupCommon.Properties.Settings.Default.SchemaDirectory);
+
+            Console.WriteLine("Wiring up databases...");
+            int dbCounter = 0;
             foreach (SetupCommon.Database database in databases)
             {
-                // TODO: fill repository, repository settings, and a models.
+                // TODO: Fill repository, repository settings, and models.
                 string databaseOutDirectory = Path.Combine("Out", database.Name);
                 if (!Directory.Exists(databaseOutDirectory))
                     Directory.CreateDirectory(databaseOutDirectory);
 
-                using (SqlConnection connection = new SqlConnection())
+                // Add the DB name to the default connection string template
+                string connectionString = connectionStringTemplate + database.Name;
+
+                using (SqlConnection connection = new SqlConnection(connectionString))
                 {
-                    string connectionString = connectionStrings.ContainsKey(database.Name) ? connectionStrings[database.Name] : "";
                     // Don't generate the entity if we aren't going to be able to write it to the database
-                    if (!string.IsNullOrEmpty(connectionString))
+                    if (!ConnectionStrings.ContainsKey(database.Name))
                     {
-                        connection.ConnectionString = connectionStrings[database.Name]/* + $"Initial Catalog={database.Name};"*/;
-                        //connection.Open();
-                        ServerConnection svrConnection = new ServerConnection(connection);
-                        Server server = new Server(svrConnection);
-
-
-                        foreach (Entity entity in database.Entities)
-                        {
-                            string entityOutDirectory = Path.Combine(databaseOutDirectory, entity.Name);
-                            if (!Directory.Exists(entityOutDirectory))
-                                Directory.CreateDirectory(entityOutDirectory);
-
-                            //File.WriteAllText(Path.Combine(entityOutDirectory, $"I{entity.Name}.cs"), TemplateHelper.FillSqlTemplate(entity));
-
-                            // Fill all .NET Framework templates
-                            File.WriteAllText(Path.Combine(entityOutDirectory, $"I{entity.Name}.cs"), TemplateHelper.FillInterfaceTemplate(entity));
-                            File.WriteAllText(Path.Combine(entityOutDirectory, $"{entity.Name}.cs"), TemplateHelper.FillBizTemplate(entity));
-                            File.WriteAllText(Path.Combine(entityOutDirectory, $"{entity.Name}DAL.cs"), TemplateHelper.FillDalTemplate(entity, connectionString));
-
-                            //SqlCommand command = new SqlCommand(TemplateHelper.FillSqlTemplate(entity), connection);
-                            //command.ExecuteNonQuery();
-                            server.ConnectionContext.ExecuteNonQuery(TemplateHelper.FillSqlTemplate(entity));
-                        }
+                        Console.WriteLine($"Could not find connection string for {database.Name}. Skipping...");
+                        continue;
                     }
-                    else
+
+                    Server server = new Server(new ServerConnection(connection));
+
+                    foreach (Entity entity in database.Entities)
                     {
-                        Console.WriteLine($"Could not find connection string for {database.Name}, will not be generating MSSQL Procedures.");
+                        // Create the entity out directory if it doesn't exist already
+                        string entityOutDirectory = Path.Combine(databaseOutDirectory, entity.Name);
+                        if (!Directory.Exists(entityOutDirectory))
+                            Directory.CreateDirectory(entityOutDirectory);
+
+                        // Fill all .NET Framework templates
+                        File.WriteAllText(Path.Combine(entityOutDirectory, $"I{entity.Name}.cs"),
+                            TemplateHelper.FillInterfaceTemplate(entity)
+                        );
+                        File.WriteAllText(Path.Combine(entityOutDirectory, $"{entity.Name}.cs"),
+                            TemplateHelper.FillBizTemplate(entity)
+                        );
+                        File.WriteAllText(Path.Combine(entityOutDirectory, $"{entity.Name}DAL.cs"),
+                            TemplateHelper.FillDalTemplate(entity,
+                                ConnectionStrings[database.Name] // Connection string pulled from config DB
+                            )
+                        );
+
+                        // Create SQL procedures in DB
+                        server.ConnectionContext.ExecuteNonQuery(TemplateHelper.FillSqlTemplate(entity));
                     }
                 }
 
-                Console.WriteLine($"Finished {database.Name}");
+                Console.WriteLine($"Wired {database.Name}");
+                dbCounter++;
             }
 
-            Console.WriteLine($"Done! Wired {databases.Count} databases");
+            Console.WriteLine($"Done! Wired {dbCounter} databases.");
         }
 
-        private static Dictionary<string, string> GetConnectionStrings(Config config)
+        private Dictionary<string, string> GetConnectionStrings()
         {
             Dictionary<string, string> connectionStrings = new Dictionary<string, string>();
+            string configConnectionString;
+            if (!Config.ConnectionStrings.TryGetValue("RobloxConfig", out configConnectionString))
+                throw new ApplicationException("Unable to find RobloxConfiguration connection string in ApplicationSettings");
 
-            using (SqlConnection connection = new SqlConnection(config.ConnectionString))
+            using (SqlConnection connection = new SqlConnection(configConnectionString))
             {
-                //connection.Open();
+                Server server = new Server(new ServerConnection(connection));
+                SqlDataReader dataReader = server.ConnectionContext.ExecuteReader("SELECT ID, Name, Value FROM dbo.ConnectionStrings");
 
-                //SqlCommand command = new SqlCommand("SELECT Name, Value FROM dbo.ConnectionStrings", connection);
-
-                ServerConnection svrConnection = new ServerConnection(connection);
-                Server server = new Server(svrConnection);
-
-                //SqlDataReader dataReader = command.ExecuteReader();
-                SqlDataReader dataReader = server.ConnectionContext.ExecuteReader("SELECT Name, Value FROM dbo.ConnectionStrings");
                 while (dataReader.Read())
                 {
-                    connectionStrings.Add(dataReader["Name"].ToString(), dataReader["Value"].ToString());
+                    string name = dataReader["Name"].ToString();
+                    string value = dataReader["Value"].ToString();
+
+                    if (!(string.IsNullOrEmpty(name) || string.IsNullOrEmpty(value)))
+                        connectionStrings.Add(name, value);
+                    else
+                        Console.WriteLine(string.Format("Warning: ConnectionString with ID {0} has missing Name and or Value!", dataReader["ID"].ToString()));
                 }
             }
 

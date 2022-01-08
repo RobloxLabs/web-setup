@@ -140,17 +140,17 @@ namespace DBWireup
                     // ID doesn't have a setter
                     createNewParams.Add($"{property.Type} {property.Name.ToLower()}");
                     createNewPropertySetters.Add($"entity.{property.Name} = {property.Name.ToLower()};");
-                }
 
-                // This is only for foreign keys!!
-                if (property.IsForeignKey)
-                {
-                    Template paramFunction = GetNewTemplate(NetFrameworkTemplates["BizGetByFK"], entity);
-                    paramFunction.Add("BIZCLASSNAME", entity.Name);
-                    paramFunction.Add("FKPROPERTYNAME", char.ToUpper(property.Name[0]) + property.Name.Substring(1));
-                    paramFunction.Add("FKIDTYPE", property.Type);
+                    // This is only for foreign keys!!
+                    if (property.IsForeignKey)
+                    {
+                        Template paramFunction = GetNewTemplate(NetFrameworkTemplates["BizGetByFK"], entity);
+                        paramFunction.Add("BIZCLASSNAME", entity.Name);
+                        paramFunction.Add("FKPROPERTYNAME", char.ToUpper(property.Name[0]) + property.Name.Substring(1));
+                        paramFunction.Add("FKIDTYPE", property.Type);
 
-                    paramFunctions.Add(paramFunction.Render());
+                        paramFunctions.Add(paramFunction.Render());
+                    }
                 }
             }
 
@@ -198,16 +198,19 @@ namespace DBWireup
 
                     queryParameters.Add($"new SqlParameter(\"{PARAM_PREFIX}{property.Name}\", _{property.Name})");
                     readerParameters.Add($"dal.{property.Name} = ({property.Type})reader[\"{property.Name}\"];");
+
+                    if (property.IsForeignKey)
+                    {
+                        Template paramFunction = GetNewTemplate(NetFrameworkTemplates["DalGetByFK"], entity);
+                        paramFunction.Add("CLASSNAME", entity.Name);
+                        paramFunction.Add("FKPROPERTYNAME", property.Name);
+                        paramFunction.Add("FKIDTYPE", property.Type);
+                        paramFunction.Add("GETBYPROPERTYPROCEDURE", GetGetByPropertyProcedure(entity, property));
+                        paramFunction.Add("CONNECTIONSTRING", entity.Name);
+
+                        paramFunctions.Add(paramFunction.Render());
+                    }
                 }
-
-                Template paramFunction = GetNewTemplate(NetFrameworkTemplates["DalParamFunction"], entity);
-                paramFunction.Add("CLASSNAME", entity.Name);
-                paramFunction.Add("FKPROPERTYNAME", property.Name);
-                paramFunction.Add("FKIDTYPE", property.Type);
-                paramFunction.Add("CONNECTIONSTRING", entity.Name);
-                paramFunction.Add("GETBYPROPERTYPROCEDURE", GetGetByPropertyProcedure(entity, property));
-
-                paramFunctions.Add(paramFunction.Render());
             }
 
             Template template = GetNewTemplate(NetFrameworkTemplates["Dal"], entity);
@@ -255,13 +258,16 @@ namespace DBWireup
                     setValues.Add($"[{property.Name}] = {PARAM_PREFIX}{property.Name}");
                     paramList.Add(PARAM_PREFIX + property.Name);
 
-                    Template paramFunction = GetNewTemplate(SqlTemplates["EntityProceduresParamFunction"], entity);
-                    paramFunction.Add("TABLENAME", entity.TableName);
-                    paramFunction.Add("FKPROPERTYNAME", property.Name);
-                    paramFunction.Add("FKIDSQLTYPE", property.SqlType);
-                    paramFunction.Add("GETBYPROPERTYPROCEDURE", GetGetByPropertyProcedure(entity, property));
+                    if (property.IsForeignKey)
+                    {
+                        Template paramFunction = GetNewTemplate(SqlTemplates["EntityProceduresFKLookup"], entity);
+                        paramFunction.Add("TABLENAME", entity.TableName);
+                        paramFunction.Add("FKPROPERTYNAME", property.Name);
+                        paramFunction.Add("FKIDSQLTYPE", property.SqlType);
+                        paramFunction.Add("GETBYPROPERTYPROCEDURE", GetGetByPropertyProcedure(entity, property));
 
-                    paramFunctions.Add(paramFunction.Render());
+                        paramFunctions.Add(paramFunction.Render());
+                    }
                 }
             }
 

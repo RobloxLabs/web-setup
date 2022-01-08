@@ -1,8 +1,11 @@
-<?xml version='1.0' standalone='yes'?>
-<entity name="AssetType" namespace="Roblox" table="AssetTypes" internal="false" cacheType="Timed" idType="int" sqlIdType="Int" idAutoIncrement="true">
-  <!-- NOTE: These types were all guestimated -->
-  <property name="Value" type="string" sqlType="VARCHAR(50)" fetchableBy="true" delatableBy="true" />
-  <property name="Description" type="string" sqlType="VARCHAR(256)" fetchableBy="true" delatableBy="true" />
-  <property name="Abbreviation" type="string" sqlType="VARCHAR(20)" fetchableBy="true" delatableBy="true" />
-  <property name="RequiresReview" type="bool" sqlType="BIT" fetchableBy="true" delatableBy="true" />
-</entity>
+<?xml version="1.0"?>
+<Entity Name="AssetType">
+  <Properties>
+    <Property Name="Created" Type="DateTime" SqlType="DateTime" />
+    <Property Name="Updated" Type="DateTime" SqlType="DateTime" />
+    <Property Name="Value" Type="string" SqlType="VARCHAR(50)" />
+    <Property Name="Description" Type="string" SqlType="VARCHAR(256)" />
+    <Property Name="Abbreviation" Type="string" SqlType="VARCHAR(20)" />
+    <Property Name="RequiresReview" Type="bool" SqlType="BIT" />
+  </Properties>
+</Entity>

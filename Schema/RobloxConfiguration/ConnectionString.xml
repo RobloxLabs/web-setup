@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<Entity Name="ConnectionString">
+  <Properties>
+    <Property Name="GroupName" Type="string" SqlType="VARCHAR(256)" />
+    <Property Name="Name" Type="string" SqlType="VARCHAR(256)" />
+    <Property Name="Value" Type="string" SqlType="VARCHAR(MAX)" />
+    <Property Name="LastModified" Type="DateTime" SqlType="DateTime" />
+  </Properties>
+</Entity>

@@ -1,5 +1,9 @@
-<?xml version='1.0' standalone='yes'?>
-<entity name="RobuxBalance" namespace="Roblox.Economy.Common" table="RobuxBalances" internal="false" cacheType="Timed" idType="int" sqlIdType="Int" idAutoIncrement="true">
-  <property name="UserID" type="int" sqlType="INT" fetchableBy="true" delatableBy="true" />
-  <property name="Value" type="long" sqlType="BIGINT" fetchableBy="true" delatableBy="true" />
-</entity>
+<?xml version="1.0"?>
+<Entity Name="RobuxBalance" Namespace="Roblox.Economy.Common">
+  <Properties>
+    <Property Name="Created" Type="DateTime" SqlType="DateTime" />
+    <Property Name="Updated" Type="DateTime" SqlType="DateTime" />
+    <Property Name="UserID" Type="int" SqlType="INT" />
+    <Property Name="Value" Type="long" SqlType="BIGINT" />
+  </Properties>
+</Entity>

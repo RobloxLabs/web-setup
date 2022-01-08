@@ -8,7 +8,6 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.SqlClient.SNI" Version="3.0.0" />
     <PackageReference Include="Microsoft.SqlServer.SqlManagementObjects" Version="161.46437.65" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="StringTemplate4" Version="4.0.8" />
   </ItemGroup>
 
@@ -17,7 +16,7 @@
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="xcopy /E /I /Y $(SolutionDir)Schema $(OutDir)Schema&#xD;&#xA;xcopy /E /I /Y $(ProjectDir)Templates $(OutDir)Templates&#xD;&#xA;copy /Y $(ProjectDir)config.json $(OutDir)" />
+    <Exec Command="xcopy /E /I /Y $(SolutionDir)Schema $(OutDir)Schema&#xD;&#xA;xcopy /E /I /Y $(ProjectDir)Templates $(OutDir)Templates&#xD;&#xA;copy /Y $(ProjectDir)appsettings.json $(OutDir)" />
   </Target>
 
 </Project>

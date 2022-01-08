@@ -1,5 +1,9 @@
-<?xml version='1.0' standalone='yes'?>
-<entity name="RoleSet" namespace="Roblox" table="RoleSets" internal="false" idType="int" sqlIdType="Int">
-  <property name="Name" type="string" sqlType="VARCHAR(32)" fetchableBy="true" delatableBy="true" />
-  <property name="Roles" type="string" sqlType="VARCHAR(512)" fetchableBy="true" delatableBy="true" />
-</entity>
+<?xml version="1.0"?>
+<Entity Name="RoleSet">
+  <Properties>
+    <Property Name="Created" Type="DateTime" SqlType="DateTime" />
+    <Property Name="Updated" Type="DateTime" SqlType="DateTime" />
+    <Property Name="Name" Type="string" SqlType="VARCHAR(32)" />
+    <Property Name="Roles" Type="string" SqlType="VARCHAR(512)" />
+  </Properties>
+</Entity>

@@ -19,7 +19,7 @@ namespace DatabaseDeployer
         internal static void Setup()
         {
             if (!Directory.Exists("Templates"))
-                throw new Exception("Template directory is missing");
+                throw new DirectoryNotFoundException("Template directory is missing");
 
             foreach (string file in Directory.GetFiles("Templates"))
             {

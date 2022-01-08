@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace SetupCommon
 {
@@ -145,10 +145,9 @@ namespace SetupCommon
 
         public static void WriteJsonEntity(Entity entity, string path)
         {
-            using (TextWriter fs = File.CreateText(path))
+            using (FileStream fs = File.Create(path))
             {
-                JsonSerializer serializer = new JsonSerializer();
-                serializer.Serialize(fs, entity);
+                JsonSerializer.Serialize(fs, entity);
             }
         }
 

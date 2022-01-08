@@ -6,7 +6,16 @@ namespace DBWireup
     {
         static void Main(string[] args)
         {
-            Wirer.Run();
+            try
+            {
+                Wirer wirer = new Wirer();
+                wirer.Wireup();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Failed to wireup databases!");
+                Console.WriteLine("Exception: " + ex.ToString());
+            }
             Console.ReadKey();
         }
     }
