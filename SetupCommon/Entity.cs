@@ -54,6 +54,16 @@ namespace SetupCommon
         /// </summary>
         public List<Property> Properties { get; set; }
 
+        private void WriteIDProperty()
+        {
+            Properties.Add(new Property()
+            {
+                Name = "ID",
+                Type = IdType,
+                SqlType = SqlIdType
+            });
+        }
+
         #region IXmlSerializable Members
 
         public XmlSchema GetSchema()
@@ -88,6 +98,8 @@ namespace SetupCommon
 
             if (Properties == null || Properties.Count == 0)
                 throw new XmlException($"No properties defined for entity: \"{Name}\"");
+
+            WriteIDProperty();
         }
 
         public void WriteXml(XmlWriter writer)
