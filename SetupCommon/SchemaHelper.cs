@@ -9,11 +9,6 @@ namespace SetupCommon
 {
     public class SchemaHelper
     {
-        public static string GetEntityFilePath(Database database, Entity entity)
-        {
-            return $"{database.Name}\\{entity.Name}.xml";
-        }
-
         public static List<Database> ReadSchemaDirectory(string path)
         {
             if (path == null || !Directory.Exists(path))
@@ -55,71 +50,12 @@ namespace SetupCommon
                 if (file.EndsWith(".config.xml"))
                     ReadDatabaseConfig(file, ref database);
                 else
-                {
-                    if (SetupCommon.Properties.Settings.Default.UseLegacyEntityRead)
-                        entities.Add(ReadLegacyEntity(file));
-                    else
-                        entities.Add(ReadXmlEntity(file));
-                }
+                    entities.Add(ReadXmlEntity(file));
             }
 
             database.Entities = entities;
 
             return database;
-        }
-
-        public static Entity ReadLegacyEntity(string path)
-        {
-            XmlDocument document = new XmlDocument();
-            document.Load(path);
-            XmlElement root = document.DocumentElement;
-
-            // ID info
-            string idType = root.HasAttribute("idType") ? root.GetAttribute("idType") : "int"; // default to int
-            string sqlIdType = root.HasAttribute("sqlIdType") ? root.GetAttribute("sqlIdType") : "Int"; // default to Int
-            bool idAutoIncrement = true; // default to True
-            // Parse ID auto-increment bool
-            if (root.HasAttribute("idAutoIncrement") && !bool.TryParse(root.GetAttribute("idAutoIncrement"), out idAutoIncrement))
-                throw new Exception($"Invalid bool for idAutoIncrement: {root.GetAttribute("idAutoIncrement")}");
-
-            // Cache info
-            CacheType cacheType = CacheType.Regular;
-            // Parse CacheType enum
-            if (root.HasAttribute("cacheType") && !Enum.TryParse(root.GetAttribute("cacheType"), out cacheType))
-                throw new Exception($"Invalid cache type: {root.GetAttribute("cacheType")}");
-
-            List<Property> properties = new List<Property>();
-            properties.Add(new Property() { Name = "ID", Type = idType, SqlType = sqlIdType});
-
-            bool isDated = root.HasAttribute("dated") ? bool.Parse(root.GetAttribute("dated")) : true;
-            if (isDated)
-            {
-                properties.Add(new Property() { Name = "Created", Type = "DateTime", SqlType = "DateTime" });
-                properties.Add(new Property() { Name = "Updated", Type = "DateTime", SqlType = "DateTime" });
-            }
-
-            XmlNodeList xmlProperties = document.GetElementsByTagName("property");
-            foreach (XmlNode property in xmlProperties)
-            {
-                string propertyName = property.Attributes["name"].Value;
-                string propertyType = property.Attributes["type"].Value;
-                string propertySqlType = property.Attributes["sqlType"].Value;
-                bool isNullable = propertyType.EndsWith("?");
-
-                properties.Add(new Property() { Name = propertyName, Type = propertyType, SqlType = propertySqlType, IsNullable = isNullable });
-            }
-
-            return new Entity() {
-                Name = root.GetAttribute("name"), 
-                EntityNamespace = root.GetAttribute("namespace"), 
-                TableName = root.GetAttribute("table"),
-                IdType = idType,
-                SqlIdType = sqlIdType,
-                IdAutoIncrement = idAutoIncrement,
-                IsInternal = root.HasAttribute("internal") ? bool.Parse(root.GetAttribute("internal")) : false,
-                //CacheType = cacheType,
-                Properties = properties
-            };
         }
 
         public static Entity ReadXmlEntity(string path)
@@ -162,7 +98,6 @@ namespace SetupCommon
 
         public static void ReadDatabaseConfig(string path, ref Database database)
         {
-
             XmlDocument document = new XmlDocument();
             document.Load(path);
 
