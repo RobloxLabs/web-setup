@@ -56,7 +56,7 @@ namespace SetupCommon
 
         private void WriteIDProperty()
         {
-            Properties.Add(new Property()
+            Properties.Insert(0, new Property()
             {
                 Name = "ID",
                 Type = IdType,
