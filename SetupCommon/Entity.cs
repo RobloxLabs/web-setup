@@ -74,7 +74,7 @@ namespace SetupCommon
         public void ReadXml(XmlReader reader)
         {
             Name = reader.GetAttribute("Name");
-            EntityNamespace = reader.GetAttribute("Namespace");
+            EntityNamespace = reader.GetAttribute("Namespace") ?? "Roblox";
             TableName = reader.GetAttribute("Table") ?? string.Format(SetupCommon.Properties.Settings.Default.DefaultTableName, Name);
             IsInternal = SchemaHelper.ReadXmlAttributeBool(reader, "Internal");
             IdType = reader.GetAttribute("IdType") ?? "int";
