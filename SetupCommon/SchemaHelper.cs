@@ -87,12 +87,28 @@ namespace SetupCommon
             }
         }
 
-        public static bool ReadXmlAttributeBool(XmlReader reader, string attribute)
+        public static bool TryReadXmlAttributeBool(XmlReader reader, string attribute, out bool attributeBool)
         {
             string attrStr = reader.GetAttribute(attribute);
-            bool attrBool = false;
-            if (!string.IsNullOrEmpty(attrStr) && !bool.TryParse(attrStr, out attrBool))
-                throw new XmlException($"Invalid boolean for {attribute} attribute: \"{attrStr}\"");
+            attributeBool = false;
+
+            if (string.IsNullOrEmpty(attrStr))
+            {
+                return false;
+            }
+            else
+            {
+                if (bool.TryParse(attrStr, out attributeBool))
+                    return true;
+                else
+                    throw new XmlException($"Invalid boolean for {attribute} attribute: \"{attrStr}\"");
+            }
+        }
+
+        public static bool ReadXmlAttributeBool(XmlReader reader, string attribute)
+        {
+            bool attrBool;
+            TryReadXmlAttributeBool(reader, attribute, out attrBool);
             return attrBool;
         }
 

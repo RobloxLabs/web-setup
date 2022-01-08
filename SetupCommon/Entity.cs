@@ -77,9 +77,14 @@ namespace SetupCommon
             EntityNamespace = reader.GetAttribute("Namespace");
             TableName = reader.GetAttribute("Table") ?? string.Format(SetupCommon.Properties.Settings.Default.DefaultTableName, Name);
             IsInternal = SchemaHelper.ReadXmlAttributeBool(reader, "Internal");
-            IdType = reader.GetAttribute("IdType");
+            IdType = reader.GetAttribute("IdType") ?? "int";
             SqlIdType = reader.GetAttribute("SqlIdType") ?? "INT";
-            IdAutoIncrement = SchemaHelper.ReadXmlAttributeBool(reader, "IdAutoIncrement");
+            // Dumb weird hack
+            bool idAutoIncrement = false;
+            if (!SchemaHelper.TryReadXmlAttributeBool(reader, "IdAutoIncrement", out idAutoIncrement))
+                IdAutoIncrement = false;
+            else
+                IdAutoIncrement = idAutoIncrement;
 
             reader.ReadStartElement();
             if (reader.Name == "Properties")
