@@ -89,7 +89,7 @@ namespace SetupCommon
 
             // SQL ID Type
             SqlIdType = SchemaHelper.ReadXmlAttributeString(entity, "SqlIdType") ??
-                "INT";
+                "Int";
 
             // Dumb weird hack
             bool idAutoIncrement = false;
