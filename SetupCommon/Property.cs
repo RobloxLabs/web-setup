@@ -7,7 +7,7 @@ using System.Xml.Serialization;
 namespace SetupCommon
 {
     [Serializable]
-    public class Property : IXmlSerializable
+    public class Property
     {
         /// <summary>
         /// Name of the property
@@ -36,29 +36,26 @@ namespace SetupCommon
         [DefaultValue(false)]
         public bool IsNullable { get; set; }
 
-        #region IXmlSerializable Members
+        #region XML Serialization Members
 
-        public XmlSchema GetSchema()
+        public void ReadXml(XmlElement property)
         {
-            return null;
-        }
-
-        public void ReadXml(XmlReader reader)
-        {
-            Name = reader.GetAttribute("Name");
-            Type = reader.GetAttribute("Type");
-            SqlType = reader.GetAttribute("SqlType");
-            IsForeignKey = SchemaHelper.ReadXmlAttributeBool(reader, "IsForeignKey");
+            // Read attributes
+            Name = property.GetAttribute("Name");
+            Type = property.GetAttribute("Type");
+            SqlType = property.GetAttribute("SqlType");
+            IsForeignKey = SchemaHelper.ReadXmlAttributeBool(property, "IsForeignKey");
             IsNullable = Type.EndsWith("?");
         }
 
-        public void WriteXml(XmlWriter writer)
+        public void WriteXml(XmlElement parent)
         {
-            writer.WriteAttributeString("Name", Name);
-            writer.WriteAttributeString("Type", Type);
-            writer.WriteAttributeString("SqlType", SqlType);
+            XmlElement prop = parent.OwnerDocument.CreateElement("Property");
+            prop.SetAttribute("Name", Name);
+            prop.SetAttribute("Type", Type);
+            prop.SetAttribute("SqlType", SqlType);
             if (IsForeignKey)
-                writer.WriteAttributeString("IsForeignKey", IsForeignKey.ToString());
+                prop.SetAttribute("IsForeignKey", IsForeignKey.ToString());
         }
 
         #endregion

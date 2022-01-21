@@ -8,5 +8,8 @@
     <Setting Name="DefaultTableName" Type="System.String" Scope="Application">
       <Value Profile="(Default)">{0}s</Value>
     </Setting>
+    <Setting Name="OutputFolder" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Output</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -65,8 +65,18 @@ namespace SetupCommon
 
             using (FileStream fs = File.OpenRead(path))
             {
-                XmlSerializer serializer = new XmlSerializer(typeof(Entity));
-                return (Entity)serializer.Deserialize(fs);
+                Entity entity = new Entity();
+                XmlDocument root = new XmlDocument();
+
+                root.Load(fs);
+                // Technically can support reading multiple entities from the same file
+                foreach (XmlNode node in root.ChildNodes)
+                {
+                    if (node.NodeType == XmlNodeType.Element)
+                        entity.ReadXml((XmlElement)node); // Reads from the first node in the document
+                }
+
+                return entity;
             }
         }
 
@@ -74,8 +84,10 @@ namespace SetupCommon
         {
             using (FileStream fs = File.Create(path))
             {
-                XmlSerializer serializer = new XmlSerializer(typeof(Entity));
-                serializer.Serialize(fs, entity);
+                XmlDocument root = new XmlDocument();
+
+                root.Load(fs);
+                entity.WriteXml(root.DocumentElement); // Writes to the root node of the document
             }
         }
 
@@ -87,9 +99,9 @@ namespace SetupCommon
             }
         }
 
-        public static bool TryReadXmlAttributeBool(XmlReader reader, string attribute, out bool attributeBool)
+        public static bool TryReadXmlAttributeBool(XmlElement element, string attributeName, out bool attributeBool)
         {
-            string attrStr = reader.GetAttribute(attribute);
+            string attrStr = element.GetAttribute(attributeName);
             attributeBool = false;
 
             if (string.IsNullOrEmpty(attrStr))
@@ -101,15 +113,23 @@ namespace SetupCommon
                 if (bool.TryParse(attrStr, out attributeBool))
                     return true;
                 else
-                    throw new XmlException($"Invalid boolean for {attribute} attribute: \"{attrStr}\"");
+                    throw new XmlException($"Invalid boolean for {attributeName} attribute: \"{attrStr}\"");
             }
         }
 
-        public static bool ReadXmlAttributeBool(XmlReader reader, string attribute)
+        public static bool ReadXmlAttributeBool(XmlElement element, string attributeName)
         {
-            bool attrBool;
-            TryReadXmlAttributeBool(reader, attribute, out attrBool);
-            return attrBool;
+            bool value;
+            TryReadXmlAttributeBool(element, attributeName, out value);
+            return value;
+        }
+
+        public static string ReadXmlAttributeString(XmlElement element, string attributeName)
+        {
+            if (!string.IsNullOrEmpty(element.GetAttribute(attributeName)))
+                return element.GetAttribute(attributeName);
+            else
+                return null;
         }
 
         public static void ReadDatabaseConfig(string path, ref Database database)

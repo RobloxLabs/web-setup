@@ -16,6 +16,7 @@ namespace DBWireup
                 Console.WriteLine("Failed to wireup databases!");
                 Console.WriteLine("Exception: " + ex.ToString());
             }
+
             Console.ReadKey();
         }
     }

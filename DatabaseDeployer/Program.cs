@@ -16,7 +16,8 @@ namespace DatabaseDeployer
                 Console.WriteLine("Failed to deploy databases!");
                 Console.WriteLine("Exception: " + ex.ToString());
             }
-            Console.ReadKey();
+
+            //Console.ReadKey();
         }
     }
 }

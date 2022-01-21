@@ -20,7 +20,7 @@ namespace SchemaConverter
             foreach (Database database in databases)
             {
                 // Create directory for the DB if it doesn't exist already
-                string path = Properties.Settings.Default.SchemaOutputPath + "\\" + database.Name;
+                string path = SetupCommon.Properties.Settings.Default.OutputFolder + "\\" + database.Name;
                 if (!Directory.Exists(path))
                     Directory.CreateDirectory(path);
 

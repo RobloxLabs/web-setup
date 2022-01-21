@@ -27,8 +27,8 @@ namespace DBWireup
                 Config.DefaultUserID,
                 Config.DefaultPassword);
 
-            if (!Directory.Exists("Out"))
-                Directory.CreateDirectory("Out");
+            if (!Directory.Exists(SetupCommon.Properties.Settings.Default.OutputFolder))
+                Directory.CreateDirectory(SetupCommon.Properties.Settings.Default.OutputFolder);
 
             Console.WriteLine("Getting connection strings from database...");
             ConnectionStrings = GetConnectionStrings();
@@ -41,57 +41,67 @@ namespace DBWireup
 
             Console.WriteLine("Wiring up databases...");
             int dbCounter = 0;
+
             foreach (SetupCommon.Database database in databases)
             {
-                // TODO: Fill repository, repository settings, and models.
-                string databaseOutDirectory = Path.Combine("Out", database.Name);
-                if (!Directory.Exists(databaseOutDirectory))
-                    Directory.CreateDirectory(databaseOutDirectory);
-
-                // Add the DB name to the default connection string template
-                string connectionString = connectionStringTemplate + database.Name;
-
-                using (SqlConnection connection = new SqlConnection(connectionString))
+                try
                 {
-                    // Don't generate the entity if we aren't going to be able to write it to the database
-                    if (!ConnectionStrings.ContainsKey(database.Name))
+                    // TODO: Fill repository, repository settings, and models.
+                    string databaseOutDirectory = Path.Combine(SetupCommon.Properties.Settings.Default.OutputFolder, database.Name);
+                    if (!Directory.Exists(databaseOutDirectory))
+                        Directory.CreateDirectory(databaseOutDirectory);
+
+                    // Add the DB name to the default connection string template
+                    string connectionString = connectionStringTemplate + database.Name;
+
+                    using (SqlConnection connection = new SqlConnection(connectionString))
                     {
-                        Console.WriteLine($"Could not find connection string for {database.Name}. Skipping...");
-                        continue;
+                        // Don't generate the entity if we aren't going to be able to write it to the database
+                        if (!ConnectionStrings.ContainsKey(database.Name))
+                        {
+                            Console.WriteLine($"Could not find connection string for {database.Name}. Skipping...");
+                            continue;
+                        }
+
+                        Server server = new Server(new ServerConnection(connection));
+
+                        foreach (Entity entity in database.Entities)
+                        {
+                            // Create the entity out directory if it doesn't exist already
+                            string entityOutDirectory = Path.Combine(databaseOutDirectory, entity.Name);
+                            if (!Directory.Exists(entityOutDirectory))
+                                Directory.CreateDirectory(entityOutDirectory);
+
+                            // Fill all .NET Framework templates
+                            File.WriteAllText(Path.Combine(entityOutDirectory, $"I{entity.Name}.cs"),
+                                TemplateHelper.FillInterfaceTemplate(entity)
+                            );
+                            File.WriteAllText(Path.Combine(entityOutDirectory, $"{entity.Name}.cs"),
+                                TemplateHelper.FillBizTemplate(entity)
+                            );
+                            File.WriteAllText(Path.Combine(entityOutDirectory, $"{entity.Name}DAL.cs"),
+                                TemplateHelper.FillDalTemplate(entity,
+                                    ConnectionStrings[database.Name] // Connection string pulled from config DB
+                                )
+                            );
+
+                            // Create SQL procedures in DB
+                            server.ConnectionContext.ExecuteNonQuery(TemplateHelper.FillSqlTemplate(entity));
+                        }
                     }
 
-                    Server server = new Server(new ServerConnection(connection));
-
-                    foreach (Entity entity in database.Entities)
-                    {
-                        // Create the entity out directory if it doesn't exist already
-                        string entityOutDirectory = Path.Combine(databaseOutDirectory, entity.Name);
-                        if (!Directory.Exists(entityOutDirectory))
-                            Directory.CreateDirectory(entityOutDirectory);
-
-                        // Fill all .NET Framework templates
-                        File.WriteAllText(Path.Combine(entityOutDirectory, $"I{entity.Name}.cs"),
-                            TemplateHelper.FillInterfaceTemplate(entity)
-                        );
-                        File.WriteAllText(Path.Combine(entityOutDirectory, $"{entity.Name}.cs"),
-                            TemplateHelper.FillBizTemplate(entity)
-                        );
-                        File.WriteAllText(Path.Combine(entityOutDirectory, $"{entity.Name}DAL.cs"),
-                            TemplateHelper.FillDalTemplate(entity,
-                                ConnectionStrings[database.Name] // Connection string pulled from config DB
-                            )
-                        );
-
-                        // Create SQL procedures in DB
-                        server.ConnectionContext.ExecuteNonQuery(TemplateHelper.FillSqlTemplate(entity));
-                    }
+                    Console.WriteLine($"Wired {database.Name}");
+                    dbCounter++;
                 }
-
-                Console.WriteLine($"Wired {database.Name}");
-                dbCounter++;
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Failed to wireup {database.Name}! Reason: {ex.Message}");
+                }
             }
 
             Console.WriteLine($"Done! Wired {dbCounter} databases.");
+            if (dbCounter <= 0)
+                Console.WriteLine("That might be a problem...");
         }
 
         private Dictionary<string, string> GetConnectionStrings()

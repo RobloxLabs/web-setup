@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "DatabaseDeployer": {
+      "commandName": "Project"
+    }
+  }
+}
