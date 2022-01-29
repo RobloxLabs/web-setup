@@ -41,6 +41,11 @@ namespace DBWireup
         public IDictionary<string, string> ConnectionStrings { get; set; }
 
         /// <summary>
+        /// The name used for the connection string property of generated DALs.
+        /// </summary>
+        public string ConnectionStringPropertyName { get; set; }
+
+        /// <summary>
         /// Determines whether or not auto-generated connection strings should be
         /// used instead of pulling a list of connection strings from the config DB.
         /// </summary>
@@ -50,5 +55,10 @@ namespace DBWireup
         /// Enables the procedure wireup process.
         /// </summary>
         public bool DoProcedureWireup { get; set; }
+
+        /// <summary>
+        /// When enabled, skips the connection the configuration database.
+        /// </summary>
+        public bool SkipConfigDBConnection { get; set; }
     }
 }

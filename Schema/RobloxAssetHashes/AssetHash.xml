@@ -1,14 +1,17 @@
 <?xml version="1.0"?>
-<Entity Name="AssetHash" TableName="AssetHashes" IdType="long" SqlIdType="BigInt" >
+<Entity Name="AssetHash" Table="AssetHashes" IdType="long" SqlIdType="BigInt" >
   <Properties>
   <!-- All a rough estimate -->
     <Property Name="AssetTypeID" Type="int" SqlType="INT" IsForeignKey="true" />
-	<!--Property Name="IsReviewed" Type="bool" SqlType="BIT" /-->
 	<Property Name="IsApproved" Type="bool" SqlType="BIT" />
-	<Property Name="HashID" Type="long" SqlType="BigInt" />
-    <!--Property Name="Hash" Type="string" SqlType="VARCHAR(32)" IsForeignKey="true" /-->
+	<!--
+		While this was most likely actually here, it's rediculously inefficient to have.
+		Why store the hash in both the RobloxFiles.Files table *and* in the asset hash table??
+		Just reference the File ID...
+	-->
+	<Property Name="Hash" Type="string" SqlType="VARCHAR(32)" IsForeignKey="true" />
 	<Property Name="CreatorID" Type="int" SqlType="INT" />
     <Property Name="Created" Type="DateTime" SqlType="DateTime" />
-    <!--Property Name="Updated" Type="DateTime" SqlType="DateTime" /-->
+    <Property Name="Updated" Type="DateTime" SqlType="DateTime" />
   </Properties>
 </Entity>

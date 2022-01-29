@@ -77,7 +77,8 @@ namespace SetupCommon
                 "Roblox";
 
             // SQL Table Name
-            TableName = SchemaHelper.ReadXmlAttributeString(entity, "Table") ?? 
+            TableName = (SchemaHelper.ReadXmlAttributeString(entity, "Table") ?? // Table or TableName
+                SchemaHelper.ReadXmlAttributeString(entity, "TableName")) ??
                 string.Format(SetupCommon.Properties.Settings.Default.DefaultTableName, Name);
 
             // Is Internal

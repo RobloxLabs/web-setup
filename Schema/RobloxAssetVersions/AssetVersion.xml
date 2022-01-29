@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<Entity Name="AssetVersion" IdType="long" SqlIdType="BigInt" >
+  <Properties>
+    <Property Name="AssetID" Type="int" SqlType="INT" IsForeignKey="true" />
+    <Property Name="AssetTypeID" Type="int" SqlType="INT" IsForeignKey="true" />
+	<Property Name="AssetHashID" Type="long" SqlType="BigInt" IsForeignKey="true" />
+	<Property Name="VersionNumber" Type="int" SqlType="INT" />
+	<Property Name="IsApproved" Type="bool" SqlType="BIT" />
+	<Property Name="CreatorID" Type="int" SqlType="INT" />
+    <Property Name="Created" Type="DateTime" SqlType="DateTime" />
+    <Property Name="Updated" Type="DateTime" SqlType="DateTime" />
+  </Properties>
+</Entity>

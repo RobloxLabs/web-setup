@@ -145,6 +145,7 @@ namespace DBWireup
                     if (property.IsForeignKey)
                     {
                         Template paramFunction = GetNewTemplate(NetFrameworkTemplates["BizGetByFK"], entity);
+                        paramFunction.Add("TABLENAME", entity.TableName);
                         paramFunction.Add("BIZCLASSNAME", entity.Name);
                         paramFunction.Add("FKPROPERTYNAME", char.ToUpper(property.Name[0]) + property.Name.Substring(1));
                         paramFunction.Add("FKIDTYPE", property.Type);
@@ -178,6 +179,7 @@ namespace DBWireup
             List<string> queryParameters = new List<string>();
             List<string> readerParameters = new List<string>();
             List<string> paramFunctions = new List<string>();
+            string connectionStringPropName = $"dbConnectionString_{entity.Name}DAL"; // Config.ConnectionStringPropertyName
 
             foreach (Property property in entity.Properties)
             {
@@ -206,7 +208,7 @@ namespace DBWireup
                         paramFunction.Add("FKPROPERTYNAME", property.Name);
                         paramFunction.Add("FKIDTYPE", property.Type);
                         paramFunction.Add("GETBYPROPERTYPROCEDURE", GetGetByPropertyProcedure(entity, property));
-                        paramFunction.Add("CONNECTIONSTRING", entity.Name);
+                        paramFunction.Add("CONNECTIONSTRING", connectionStringPropName);
 
                         paramFunctions.Add(paramFunction.Render());
                     }
@@ -220,11 +222,11 @@ namespace DBWireup
                 template.Remove("NAMESPACE");
                 template.Add("NAMESPACE", "Roblox.DataAccess");
             }
-            template.Add("CONNECTIONSTRING", entity.Name);
+            template.Add("CONNECTIONSTRING", connectionStringPropName);
             template.Add("CONNECTIONSTRINGVALUE", connectionString);
-            template.Add("DELETEPROCEDURE", GetDeleteProcedure(entity));
+            template.Add("DELETEPROCEDURE", GetDeleteProcedure(entity) + "ByID");
             template.Add("INSERTPROCEDURE", GetInsertProcedure(entity));
-            template.Add("UPDATEPROCEDURE", GetUpdateProcedure(entity));
+            template.Add("UPDATEPROCEDURE", GetUpdateProcedure(entity) + "ByID");
             template.Add("GETPROCEDURE", GetGetProcedure(entity) + "ByID");
             template.Add("IDSQLDBTYPE", entity.SqlIdType);
             template.Add("DALFIELDS", string.Join("\n", dalFields.ToArray()));
@@ -274,9 +276,9 @@ namespace DBWireup
             Template template = GetNewTemplate(SqlTemplates["EntityProcedures"], entity);
             template.Add("TABLENAME", entity.TableName);
             template.Add("SQLIDTYPE", entity.SqlIdType);
-            template.Add("DELETEPROCEDURE", GetDeleteProcedure(entity));
+            template.Add("DELETEPROCEDURE", GetDeleteProcedure(entity) + "ByID");
             template.Add("INSERTPROCEDURE", GetInsertProcedure(entity));
-            template.Add("UPDATEPROCEDURE", GetUpdateProcedure(entity));
+            template.Add("UPDATEPROCEDURE", GetUpdateProcedure(entity) + "ByID");
             template.Add("GETPROCEDURE", GetGetProcedure(entity) + "ByID");
             template.Add("SQLINPUTPARAMETERLIST", ", " + string.Join(",\n", sqlInputParameterList.ToArray()));
             template.Add("COLUMNLIST", string.Join(",\n", columnList.ToArray()));

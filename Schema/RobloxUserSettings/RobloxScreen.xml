@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<Entity Name="RobloxScreen">
+  <Properties>
+    <Property Name="ScreenName" Type="string" SqlType="VARCHAR(20)" />
+    <Property Name="Created" Type="DateTime" SqlType="DateTime" />
+    <Property Name="Updated" Type="DateTime" SqlType="DateTime" />
+  </Properties>
+</Entity>
