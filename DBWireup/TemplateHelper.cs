@@ -253,7 +253,8 @@ namespace DBWireup
                     string extra = "";
                     if (property.IsNullable)
                         extra += " = NULL";
-                    if (property.Type == "string")
+                    // Hack for binary sql types
+                    if (property.Type == "string" && !(property.SqlType.Contains("binary") || property.SqlType.Contains("BINARY")))
                         extra += " = \"\"";
                     sqlInputParameterList.Add($"{PARAM_PREFIX}{property.Name}				{property.SqlType}{extra}");
                     columnList.Add("[" + property.Name + "]");
@@ -310,10 +311,10 @@ namespace DBWireup
             List<string> entityFunctions = new List<string>();
             List<string> entityCaches = new List<string>();
 
-            foreach (Entity entity in database.Entities)
+            /*foreach (Entity entity in database.Entities)
             {
 
-            }
+            }*/
 
             Template template = GetNewTemplate(NetCoreTemplates["Repository"]);
             template.Add("REPOSITORYNAME", database.RepositoryName);
@@ -328,15 +329,15 @@ namespace DBWireup
         {
             List<string> entitySettings = new List<string>();
 
-            foreach (Entity entity in database.Entities)
+            /*foreach (Entity entity in database.Entities)
             {
-                /*if (entity.CacheType == CacheType.Timed)
+                if (entity.CacheType == CacheType.Timed)
                 {
                     Template entitySettingsTemplate = GetNewTemplate(NetCoreTemplates["RepositorySettingsEntityParams"], entity);
                     entitySettingsTemplate.Add("TABLENAME", entity.TableName);
                     entitySettings.Add(entitySettingsTemplate.Render());
-                }*/
-            }
+                }
+            }*/
 
             Template template = GetNewTemplate(NetCoreTemplates["RepositorySettings"]);
             template.Add("REPOSITORYNAME", database.RepositoryName);

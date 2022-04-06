@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<Entity Name="LocationType" IdType="byte" SqlIdType="TinyInt" Namespace="Roblox.Files.Entities" >
+  <Properties>
+    <Property Name="Value" Type="string" SqlType="nvarchar(32)" />
+    <Property Name="Created" Type="DateTime" SqlType="DateTime" />
+    <Property Name="Updated" Type="DateTime" SqlType="DateTime" />
+  </Properties>
+</Entity>

@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<Entity Name="File" IdType="long" SqlIdType="BigInt" Namespace="Roblox.Files.Entities" >
+  <Properties>
+    <Property Name="MD5Hash" Type="string" SqlType="nchar(32)" />
+	<!-- We grab the FileLocations from their respective table by FileID -->
+	<!--Property Name="FileLocationID" Type="long" SqlType="BigInt" IsForeignKey="false" /-->
+    <Property Name="Created" Type="DateTime" SqlType="DateTime" />
+    <Property Name="Updated" Type="DateTime" SqlType="DateTime" />
+  </Properties>
+</Entity>

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
+using System.Xml;
 
 namespace SetupCommon
 {
@@ -27,5 +28,32 @@ namespace SetupCommon
         /// List of all entities (tables) in the database
         /// </summary>
         public List<Entity> Entities { get; set; }
+
+        #region XML Serialization Members
+
+        public void ReadXml(XmlElement db)
+        {
+            // Read attributes
+            Name = db.GetAttribute("Name");
+
+            // Read config
+            RepositoryName = db["RepositoryName"].Value;
+            RepositoryNamespace = db["RepositoryNamespace"].Value;
+        }
+
+        public void WriteXml(XmlElement parent)
+        {
+            XmlDocument root = parent.OwnerDocument;
+            XmlElement db = root.CreateElement("Database");
+
+            // Set Name
+            db.SetAttribute("Name", Name);
+
+            // Write config
+            root.CreateElement("RepositoryName").Value = RepositoryName;
+            root.CreateElement("RepositoryNamespace").Value = RepositoryNamespace;
+        }
+
+        #endregion
     }
 }

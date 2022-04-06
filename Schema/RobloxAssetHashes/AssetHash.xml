@@ -9,7 +9,8 @@
 		Why store the hash in both the RobloxFiles.Files table *and* in the asset hash table??
 		Just reference the File ID...
 	-->
-	<Property Name="Hash" Type="string" SqlType="VARCHAR(32)" IsForeignKey="true" />
+	<!--Property Name="Hash" Type="string" SqlType="VARCHAR(32)" IsForeignKey="true" /-->
+	<Property Name="HashID" Type="long" SqlType="BigInt" IsForeignKey="true" />
 	<Property Name="CreatorID" Type="int" SqlType="INT" />
     <Property Name="Created" Type="DateTime" SqlType="DateTime" />
     <Property Name="Updated" Type="DateTime" SqlType="DateTime" />

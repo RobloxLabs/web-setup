@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<Entity Name="Alert" >
+  <Properties>
+	<Property Name="UserID" Type="int" SqlType="INT" />
+	<Property Name="Text" Type="string" SqlType="nvarchar(32)" />
+    <Property Name="Created" Type="DateTime" SqlType="DateTime" />
+    <Property Name="Updated" Type="DateTime" SqlType="DateTime" />
+	<Property Name="VisibilityTypeID" Type="int" SqlType="INT" />
+  </Properties>
+</Entity>

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<Entity Name="Invitation" >
+  <Properties>
+	<Property Name="InviterID" Type="int" SqlType="INT" />
+	<Property Name="InviteeID" Type="int" SqlType="INT" />
+	<Property Name="InvitationTypeID" Type="int" SqlType="INT" />
+	<Property Name="InvitationMessageID" Type="int" SqlType="INT" />
+	<Property Name="ResponseTypeID" Type="int?" SqlType="INT" />
+	<Property Name="ResponseMessageID" Type="int?" SqlType="INT" />
+    <Property Name="Created" Type="DateTime" SqlType="DateTime" />
+    <Property Name="Updated" Type="DateTime" SqlType="DateTime" />
+  </Properties>
+</Entity>

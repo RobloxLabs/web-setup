@@ -107,7 +107,7 @@ namespace DBWireup
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Failed to wireup {database.Name}! Reason: {ex.Message}");
+                     Console.WriteLine($"Failed to wireup {database.Name}! Reason: {ex.Message}");
                 }
             }
 

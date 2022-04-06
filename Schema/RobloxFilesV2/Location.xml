@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!-- There should hopefully be a limited number of these -->
+<Entity Name="Location" IdType="long" SqlIdType="BigInt" Namespace="Roblox.Files.Entities" >
+  <Properties>
+	<Property Name="LocationTypeID" Type="byte" SqlType="TinyInt" IsForeignKey="true" />
+	<!-- Contains thing like "c0", "c1ak", "c2ll", "c3hw", "c4ak", "c5cf"/"c5-cf", "css", "js", "jsak", "imagesak", "images", etc. -->
+	<!-- It's possible ROBLOX intended for this to be a varbinary, but I honestly can't see how that's better than a varchar. -->
+	<Property Name="Value" Type="string" SqlType="nvarchar(10)" IsForeignKey="true" />
+    <Property Name="Created" Type="DateTime" SqlType="DateTime" />
+    <Property Name="Updated" Type="DateTime" SqlType="DateTime" />
+  </Properties>
+</Entity>

@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<Entity Name="FileLocation" IdType="long" SqlIdType="BigInt" Namespace="Roblox.Files.Entities" >
+  <Properties>
+    <Property Name="FileID" Type="long" SqlType="BigInt" IsForeignKey="true" />
+    <Property Name="LocationID" Type="byte" SqlType="TinyInt" IsForeignKey="false" />
+    <Property Name="Created" Type="DateTime" SqlType="DateTime" />
+    <Property Name="Updated" Type="DateTime" SqlType="DateTime" />
+  </Properties>
+</Entity>

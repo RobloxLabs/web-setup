@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<Entity Name="AssetHashScript" IdType="long" SqlIdType="BigInt" >
+  <Properties>
+	<Property Name="ScriptID" Type="int" SqlType="INT" />
+	<Property Name="AssetHashID" Type="long" SqlType="BigInt" />
+    <Property Name="Created" Type="DateTime" SqlType="DateTime" />
+    <Property Name="Updated" Type="DateTime" SqlType="DateTime" />
+  </Properties>
+</Entity>

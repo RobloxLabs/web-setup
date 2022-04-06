@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<Entity Name="ShoutboxPost" >
+  <Properties>
+	<Property Name="UserID" Type="int" SqlType="INT" />
+	<Property Name="Text" Type="string" SqlType="nvarchar(128)" />
+    <Property Name="Created" Type="DateTime" SqlType="DateTime" />
+  </Properties>
+</Entity>
