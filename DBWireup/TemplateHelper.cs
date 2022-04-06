@@ -125,6 +125,7 @@ namespace DBWireup
             List<string> createNewParams = new List<string>();
             List<string> createNewPropertySetters = new List<string>();
             List<string> paramFunctions = new List<string>();
+            List<string> stateTokenCollection = new List<string>();
 
             foreach (Property property in entity.Properties)
             {
@@ -149,6 +150,7 @@ namespace DBWireup
                         paramFunction.Add("BIZCLASSNAME", entity.Name);
                         paramFunction.Add("FKPROPERTYNAME", char.ToUpper(property.Name[0]) + property.Name.Substring(1));
                         paramFunction.Add("FKIDTYPE", property.Type);
+                        stateTokenCollection.Add("\tyield return new StateToken(string.Format(\"" + property.Name + ":{0}\", " + property.Name + "));");
 
                         paramFunctions.Add(paramFunction.Render());
                     }
@@ -164,6 +166,7 @@ namespace DBWireup
             template.Add("CREATENEWPARAMS", string.Join(", ", createNewParams.ToArray()));
             template.Add("CREATENEWPROPERTYSETTERS", string.Join("\n", createNewPropertySetters.ToArray()));
             template.Add("PARAMFUNCTIONS", string.Join("\n", paramFunctions.ToArray()));
+            template.Add("STATETOKENCOLLECTION", string.Join("\n", stateTokenCollection.ToArray()));
 
             return template.Render();
         }

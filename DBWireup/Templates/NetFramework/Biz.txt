@@ -78,7 +78,7 @@ namespace ~NAMESPACE~
         }
 
         public static CacheInfo EntityCacheInfo = new CacheInfo(
-            new CacheabilitySettings(collectionsAreCacheable: true, countsAreCacheable: true, entityIsCacheable: true, idLookupsAreCacheable: true, hasUnqualifiedCollections: true),
+            new CacheabilitySettings(collectionsAreCacheable: true, countsAreCacheable: true, entityIsCacheable: true, idLookupsAreCacheable: true),
             typeof(~BIZCLASSNAME~).ToString(),
             true
         );
@@ -90,7 +90,7 @@ namespace ~NAMESPACE~
 
         public IEnumerable<StateToken> BuildStateTokenCollection()
         {
-            //%^^^^yield return new StateToken(string.Format("<FKPROPERTYNAME>:{0}", <FKPROPERTYNAME>));^^^^%
+        ~STATETOKENCOLLECTION~
             yield break;
         }
 
