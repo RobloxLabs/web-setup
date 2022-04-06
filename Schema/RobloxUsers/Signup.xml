@@ -3,6 +3,5 @@
   <Properties>
 	<Property Name="UserID" Type="int" SqlType="INT" IsForeignKey="true" />
     <Property Name="Created" Type="DateTime" SqlType="DateTime" />
-    <Property Name="Updated" Type="DateTime" SqlType="DateTime" />
   </Properties>
 </Entity>

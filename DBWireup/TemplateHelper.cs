@@ -175,7 +175,7 @@ namespace DBWireup
         /// Fill template I'll finish this later too lazy - memes 2021
         /// </summary>
         /// <param name="entity"></param>
-        internal static string FillDalTemplate(Entity entity, string connectionString)
+        internal static string FillDalTemplate(Entity entity, string connectionStringValue)
         {
             List<string> dalFields = new List<string>();
             List<string> dalProperties = new List<string>();
@@ -226,7 +226,7 @@ namespace DBWireup
                 template.Add("NAMESPACE", "Roblox.DataAccess");
             }
             template.Add("CONNECTIONSTRING", connectionStringPropName);
-            template.Add("CONNECTIONSTRINGVALUE", connectionString);
+            template.Add("CONNECTIONSTRINGVALUE", connectionStringValue);
             template.Add("DELETEPROCEDURE", GetDeleteProcedure(entity) + "ByID");
             template.Add("INSERTPROCEDURE", GetInsertProcedure(entity));
             template.Add("UPDATEPROCEDURE", GetUpdateProcedure(entity) + "ByID");

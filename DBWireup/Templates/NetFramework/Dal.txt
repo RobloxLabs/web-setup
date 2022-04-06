@@ -19,7 +19,7 @@ namespace ~NAMESPACE~
         ~DALPROPERTIES~
         private static string ~CONNECTIONSTRING~
         {
-            get { return "~CONNECTIONSTRINGVALUE~"; }
+            get { return ~CONNECTIONSTRINGVALUE~; }
         }
 
         ~ACCESSIBILITY~ ~DALCLASSNAME~()
