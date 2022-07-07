@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<Entity Name="PunishmentType" IdType="byte" SqlIdType="TinyInt" Namespace="Roblox.Moderation" >
+  <Properties>
+    <Property Name="Value" Type="string" SqlType="nvarchar(32)" />
+    <Property Name="AccountStatusID" Type="byte" SqlType="TinyInt" />
+    <Property Name="DurationInDays" Type="byte?" SqlType="TinyInt" />
+    <Property Name="SortOrder" Type="byte" SqlType="TinyInt" />
+    <Property Name="IconName" Type="string" SqlType="nvarchar(32)" />
+    <Property Name="Created" Type="DateTime" SqlType="DateTime" />
+    <Property Name="Updated" Type="DateTime" SqlType="DateTime" />
+  </Properties>
+</Entity>

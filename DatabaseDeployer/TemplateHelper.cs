@@ -64,13 +64,19 @@ namespace DatabaseDeployer
 
                 foreach (Property property in entity.Properties)
                 {
-                    string egg = $"[{property.Name}] {property.SqlType}";
+                    string propertySql = $"[{property.Name}] {property.SqlType}";
+
                     if (!property.IsNullable)
-                        egg += " NOT";
-                    egg += " NULL";
+                        propertySql += " NOT";
+                    propertySql += " NULL";
+
                     if (property.Name == "ID" && entity.IdAutoIncrement)
-                        egg += " IDENTITY(1,1)";
-                    tableProperties.Add(egg);
+                        propertySql += " IDENTITY(1,1)";
+
+                    if (property.Name == "Created" || property.Name == "Updated")
+                        propertySql += " DEFAULT GETDATE()";
+
+                    tableProperties.Add(propertySql);
                 }
 
                 Template table = GetNewTemplate(Templates["Table"], database);

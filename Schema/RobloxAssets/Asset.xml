@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!-- Let's hope we get this right!! -->
+<Entity Name="Asset" IdType="long" SqlIdType="BigInt" >
+  <Properties>
+    <Property Name="Name" Type="string" SqlType="NVARCHAR(50)" />
+    <Property Name="Description" Type="string" SqlType="NVARCHAR(1000)" />
+    <Property Name="AssetTypeID" Type="int" SqlType="INT" />
+	<Property Name="CurrentVersionID" Type="long" SqlType="BIGINT" />
+    <Property Name="CreatorID" Type="int" SqlType="INT" />
+	<!-- Deprecated -->
+    <!--Property Name="ToolboxID" Type="int" SqlType="INT" /-->
+	<!-- Not included directly in DAL -->
+    <!--Property Name="AssetGenres" Type="long" SqlType="BIGINT" />
+    <Property Name="AssetCategories" Type="long" SqlType="BIGINT" /-->
+    <Property Name="Created" Type="DateTime" SqlType="DateTime" />
+    <Property Name="Updated" Type="DateTime" SqlType="DateTime" />
+  </Properties>
+</Entity>

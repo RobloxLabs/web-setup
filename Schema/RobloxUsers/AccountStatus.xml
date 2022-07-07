@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<Entity Name="AccountStatus" TableName="AccountStatuses" IdType="byte" SqlIdType="TINYINT">
+  <Properties>
+	<Property Name="Value" Type="string" SqlType="nvarchar(50)" />
+	<Property Name="Description" Type="string" SqlType="nvarchar(1000)" />
+	<Property Name="Abbreviation" Type="string" SqlType="nvarchar(10)" />
+    <Property Name="Created" Type="DateTime" SqlType="DateTime" />
+    <Property Name="Updated" Type="DateTime" SqlType="DateTime" />
+  </Properties>
+</Entity>

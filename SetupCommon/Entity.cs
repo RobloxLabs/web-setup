@@ -93,11 +93,11 @@ namespace SetupCommon
                 "Int";
 
             // Dumb weird hack
-            bool idAutoIncrement = false;
-            if (!SchemaHelper.TryReadXmlAttributeBool(entity, "IdAutoIncrement", out idAutoIncrement))
-                IdAutoIncrement = false;
-            else
+            bool idAutoIncrement;
+            if (SchemaHelper.TryReadXmlAttributeBool(entity, "IdAutoIncrement", out idAutoIncrement))
                 IdAutoIncrement = idAutoIncrement;
+            else
+                IdAutoIncrement = true;
 
             // Read properties
             XmlNode props = entity.FirstChild;

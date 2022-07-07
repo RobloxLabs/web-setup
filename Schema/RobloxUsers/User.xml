@@ -16,5 +16,7 @@
     <Property Name="AcquisitionSource" Type="string" SqlType="VARCHAR(20)" />
     <Property Name="AcquisitionCampaign" Type="string" SqlType="VARCHAR(20)" />
     <Property Name="AcquisitionReferrer" Type="string" SqlType="VARCHAR(20)" />
+    <Property Name="AssociatedEntityID" Type="int?" SqlType="INT" />
+    <Property Name="AssociatedEntityType" Type="CreatorType" SqlType="TINYINT" />
   </Properties>
 </Entity>
