@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<Entity Name="AccountRoleSet">
+  <!-- The properties of the entity -->
+  <Properties>
+	<Property Name="ID" Type="int" SqlType="INT" IsPrimaryKey="true" IsReadonly="true" />
+    <Property Name="AccountID" Type="int" SqlType="INT" />
+    <Property Name="RoleSetID" Type="int" SqlType="INT" />
+    <Property Name="Created" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadonly="true" />
+    <Property Name="Updated" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadonly="true" />
+  </Properties>
+  
+  <!-- The SQL procedures for the entity -->
+  <Procedures>
+	<!-- Deletes the entity with the given ID -->
+	<Procedure Type="Delete">
+		<Parameters>
+			<Parameter Name="ID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Gets the entity with the given ID -->
+	<Procedure Type="Get">
+		<Parameters>
+			<Parameter Name="ID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Inserts the entity into the table -->
+	<Procedure Type="Insert" />
+	
+	<!-- Updates the entity with the given ID -->
+	<Procedure Type="Update">
+		<Parameters>
+			<Parameter Name="ID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Gets all AccountRoleSet IDs -->
+	<Procedure Type="GetPaged" />
+	
+	<!-- Gets all AccountRoleSet IDs by AccountID -->
+	<Procedure Type="GetPaged">
+		<Parameters>
+			<Parameter Name="AccountID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Gets all AccountRoleSet IDs by RoleSetID -->
+	<Procedure Type="GetPaged">
+		<Parameters>
+			<Parameter Name="RoleSetID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Gets a count of all AccountRoleSets in the table -->
+	<Procedure Type="GetTotal" />
+	
+  </Procedures>
+</Entity>

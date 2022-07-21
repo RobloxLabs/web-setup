@@ -9,6 +9,9 @@ namespace SetupCommon
 {
     public class SchemaHelper
     {
+        private static XmlSerializer _serializer = new XmlSerializer(typeof(Entity));
+
+
         public static List<Database> ReadSchemaDirectory(string path)
         {
             if (path == null || !Directory.Exists(path))
@@ -44,12 +47,9 @@ namespace SetupCommon
             string[] files = Directory.GetFiles(path);
             foreach (string file in files)
             {
-                if (!file.EndsWith(".xml"))
-                    continue;
-
                 if (file.EndsWith(".config.xml"))
                     ReadDatabaseConfig(file, ref database);
-                else
+                else if (file.EndsWith(".xml"))
                     entities.Add(ReadXmlEntity(file));
             }
 
@@ -58,6 +58,11 @@ namespace SetupCommon
             return database;
         }
 
+        /// <summary>
+        /// The new one :)
+        /// </summary>
+        /// <param name="path">The path of the entity schema file to deserialize</param>
+        /// <returns></returns>
         public static Entity ReadXmlEntity(string path)
         {
             if (!File.Exists(path))
@@ -65,29 +70,24 @@ namespace SetupCommon
 
             using (FileStream fs = File.OpenRead(path))
             {
-                Entity entity = new Entity();
-                XmlDocument root = new XmlDocument();
-
-                root.Load(fs);
-                // Technically can support reading multiple entities from the same file
-                foreach (XmlNode node in root.ChildNodes)
-                {
-                    if (node.NodeType == XmlNodeType.Element)
-                        entity.ReadXml((XmlElement)node); // Reads from the first node in the document
-                }
-
+                var entity = (Entity)_serializer.Deserialize(fs);
+                // HACK: Stupid
+                if (string.IsNullOrEmpty(entity.TableName))
+                    entity.TableName = string.Format(SetupCommon.Properties.Settings.Default.DefaultTableName, entity.Name);
                 return entity;
             }
         }
 
+        /// <summary>
+        /// The new one :)
+        /// </summary>
+        /// <param name="entity">The entity to serialize & write</param>
+        /// <param name="path">The path of the entity schema file to write</param>
         public static void WriteXmlEntity(Entity entity, string path)
         {
             using (FileStream fs = File.Create(path))
             {
-                XmlDocument root = new XmlDocument();
-
-                root.Load(fs);
-                entity.WriteXml(root.DocumentElement); // Writes to the root node of the document
+                _serializer.Serialize(fs, entity);
             }
         }
 
@@ -97,39 +97,6 @@ namespace SetupCommon
             {
                 JsonSerializer.Serialize(fs, entity);
             }
-        }
-
-        public static bool TryReadXmlAttributeBool(XmlElement element, string attributeName, out bool attributeBool)
-        {
-            string attrStr = element.GetAttribute(attributeName);
-            attributeBool = false;
-
-            if (string.IsNullOrEmpty(attrStr))
-            {
-                return false;
-            }
-            else
-            {
-                if (bool.TryParse(attrStr, out attributeBool))
-                    return true;
-                else
-                    throw new XmlException($"Invalid boolean for {attributeName} attribute: \"{attrStr}\"");
-            }
-        }
-
-        public static bool ReadXmlAttributeBool(XmlElement element, string attributeName)
-        {
-            bool value;
-            TryReadXmlAttributeBool(element, attributeName, out value);
-            return value;
-        }
-
-        public static string ReadXmlAttributeString(XmlElement element, string attributeName)
-        {
-            if (!string.IsNullOrEmpty(element.GetAttribute(attributeName)))
-                return element.GetAttribute(attributeName);
-            else
-                return null;
         }
 
         public static void ReadDatabaseConfig(string path, ref Database database)

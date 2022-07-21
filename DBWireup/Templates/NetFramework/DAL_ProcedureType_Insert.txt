@@ -1,0 +1,10 @@
+﻿        ~ACCESSIBILITY~ void Insert()
+        {
+            var queryParameters = new List<SqlParameter>
+            {
+                ~QUERYPARAMETERS~
+            };
+
+            using var database = new GuardedDatabase(~CONNECTIONSTRING~);
+            _ID = database.Insert<int>("[dbo].[~PROCEDURE~]", queryParameters: queryParameters.ToArray());
+        }

@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="xcopy /E /I /Y $(SolutionDir)Schema $(OutDir)Schema&#xD;&#xA;xcopy /E /I /Y $(ProjectDir)Templates $(OutDir)Templates&#xD;&#xA;copy /Y $(ProjectDir)appsettings.json $(OutDir)" />
+    <Exec Command="xcopy /E /I /Y $(SolutionDir)SchemaV3 $(OutDir)SchemaV3&#xD;&#xA;xcopy /E /I /Y $(ProjectDir)Templates $(OutDir)Templates&#xD;&#xA;copy /Y $(ProjectDir)appsettings.json $(OutDir)" />
   </Target>
 
   <ItemGroup>

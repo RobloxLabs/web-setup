@@ -1,0 +1,18 @@
+﻿        ~ACCESSIBILITY~ static ~DALCLASSNAME~ Get(~PARAMETERS~)
+        {
+            ~PARAMETERVALIDATION~
+
+            var queryParameters = new List<SqlParameter>
+            {
+                ~QUERYPARAMETERS~
+            };
+
+            var dbInfo = new dbInfo(
+                ~CONNECTIONSTRING~,
+                "~GETPROCEDURE~",
+                queryParameters
+            );
+
+            using var database = new GuardedDatabase(~CONNECTIONSTRING~);
+            database.Update("[dbo].[~PROCEDURE~]", BuildDAL, queryParameters: queryParameters.ToArray());
+        }

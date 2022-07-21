@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="SchemaDirectory" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">Schema</Value>
+      <Value Profile="(Default)">SchemaV3</Value>
     </Setting>
     <Setting Name="DefaultTableName" Type="System.String" Scope="Application">
       <Value Profile="(Default)">{0}s</Value>

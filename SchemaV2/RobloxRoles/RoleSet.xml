@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<Entity Name="RoleSet">
+  <!-- The properties of the entity -->
+  <Properties>
+    <Property Name="Name" Type="string" SqlType="VARCHAR(32)" />
+    <Property Name="Rank" Type="int" SqlType="INT" />
+    <Property Name="Created" Type="DateTime" SqlType="DateTime" Default="getdate()" />
+    <Property Name="Updated" Type="DateTime" SqlType="DateTime" Default="getdate()" />
+  </Properties>
+  
+  <!-- The SQL procedures for the entity -->
+  <Procedures>
+	<!-- Deletes the entity with the given ID -->
+	<Procedure Type="Delete">
+		<Parameter Name="ID" />
+	</Procedure>
+	
+	<!-- Gets the entity with the given ID -->
+	<Procedure Type="Get">
+		<Parameter Name="ID" />
+	</Procedure>
+	
+	<!-- Deletes the entity with the given Name -->
+	<Procedure Type="Get">
+		<Parameter Name="Name" />
+	</Procedure>
+	
+	<!-- Inserts the entity into the table -->
+	<Procedure Type="Insert" />
+	
+	<!-- Updates the entity with the given ID -->
+	<Procedure Type="Update">
+		<Parameter Name="ID" />
+	</Procedure>
+	
+  </Procedures>
+</Entity>

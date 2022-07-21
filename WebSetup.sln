@@ -1,15 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.1525
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32510.428
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DBWireup", "DBWireup\DBWireup.csproj", "{C0CF9BAA-BC09-47BB-9C99-3D86A54A23DE}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Schema", "Schema", "{6AFB58F2-CC86-47D1-A447-4B596F217686}"
-	ProjectSection(SolutionItems) = preProject
-		Schema\TEMPLATE.config.xml = Schema\TEMPLATE.config.xml
-		Schema\TEMPLATE.xml = Schema\TEMPLATE.xml
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebSetup", "WebSetup\WebSetup.csproj", "{0A51687A-7E45-499A-AA03-C1EA5912C619}"
 EndProject

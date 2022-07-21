@@ -1,11 +1,12 @@
 <?xml version="1.0"?>
 <Entity Name="Account">
   <Properties>
-    <Property Name="Created" Type="DateTime" SqlType="DateTime" />
-    <Property Name="Updated" Type="DateTime" SqlType="DateTime" />
     <Property Name="Name" Type="string" SqlType="VARCHAR(20)" />
     <Property Name="Description" Type="string" SqlType="VARCHAR(256)" />
     <Property Name="AccountStatusID" Type="byte" SqlType="TINYINT" />
-    <Property Name="RoleSetID" Type="int" SqlType="INT" />
+	<!-- Deprecated -->
+    <!--Property Name="RoleSetID" Type="int" SqlType="INT" /-->
+    <Property Name="Created" Type="DateTime" SqlType="DateTime" />
+    <Property Name="Updated" Type="DateTime" SqlType="DateTime" />
   </Properties>
 </Entity>

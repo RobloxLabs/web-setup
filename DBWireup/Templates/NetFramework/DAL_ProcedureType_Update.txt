@@ -1,0 +1,14 @@
+﻿        ~ACCESSIBILITY~ void Update()
+        {
+            if (_ID == default(int))
+                throw new ApplicationException("Required value not specified: ID.");
+
+            var queryParameters = new List<SqlParameter>
+            {
+		        //new SqlParameter("@ID", _ID), // Not sure if this is needed here yet or not
+		        ~QUERYPARAMETERS~
+            };
+
+            using var database = new GuardedDatabase(~CONNECTIONSTRING~);
+            database.Update("[dbo].[~PROCEDURE~]", _ID, queryParameters: queryParameters.ToArray());
+        }

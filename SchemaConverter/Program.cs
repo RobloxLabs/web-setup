@@ -15,6 +15,18 @@ namespace SchemaConverter
         {
             Console.WriteLine("Converting schema...");
 
+            ConvertLegacySchema();
+
+            Console.WriteLine("Done!");
+            Console.ReadKey();
+        }
+
+        /// <summary>
+        /// Eats the pre-existing schema files and re-outputs them.
+        /// This will remove all comments!!!
+        /// </summary>
+        static void ConvertLegacySchema()
+        {
             List<Database> databases = SchemaHelper.ReadSchemaDirectory(SetupCommon.Properties.Settings.Default.SchemaDirectory);
 
             foreach (Database database in databases)
@@ -32,9 +44,6 @@ namespace SchemaConverter
                 }
                 Console.WriteLine("Finished " + database.Name);
             }
-
-            Console.WriteLine("Done!");
-            Console.ReadKey();
         }
     }
 }

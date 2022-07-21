@@ -58,6 +58,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>xcopy /E /I /Y $(SolutionDir)Schema Schema</PreBuildEvent>
+    <PreBuildEvent>xcopy /E /I /Y $(SolutionDir)SchemaV3 SchemaV3</PreBuildEvent>
   </PropertyGroup>
 </Project>

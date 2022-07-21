@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 using Antlr4.StringTemplate;
 using SetupCommon;
@@ -39,10 +38,11 @@ namespace DatabaseDeployer
         /// <param name="baseTemplate"></param>
         /// <param name="entity"></param>
         /// <returns></returns>
-        private static Template GetNewTemplate(string baseTemplate, Database database)
+        private static Template GetNewTemplate(string baseTemplate, Database database = null)
         {
             Template template = new Template(baseTemplate, '~', '~');
-            template.Add("DATABASENAME", database.Name);
+            if (database != null)
+                template.Add("DATABASENAME", database.Name);
 
             return template;
         }
@@ -56,37 +56,73 @@ namespace DatabaseDeployer
 
         internal static string FillTablesTemplate(Database database)
         {
-            List<string> tables = new List<string>();
+            StringBuilder tables = new StringBuilder();
 
             foreach (Entity entity in database.Entities)
             {
-                List<string> tableProperties = new List<string>();
-
-                foreach (Property property in entity.Properties)
-                {
-                    string propertySql = $"[{property.Name}] {property.SqlType}";
-
-                    if (!property.IsNullable)
-                        propertySql += " NOT";
-                    propertySql += " NULL";
-
-                    if (property.Name == "ID" && entity.IdAutoIncrement)
-                        propertySql += " IDENTITY(1,1)";
-
-                    if (property.Name == "Created" || property.Name == "Updated")
-                        propertySql += " DEFAULT GETDATE()";
-
-                    tableProperties.Add(propertySql);
-                }
-
-                Template table = GetNewTemplate(Templates["Table"], database);
-                table.Add("TABLENAME", entity.TableName);
-                table.Add("TABLEPROPERTIES", string.Join(",\n", tableProperties.ToArray()));
-
-                tables.Add(table.Render());
+                tables.AppendLine(FillTableTemplate(entity));
+                //tables.AppendLine("GO");
             }
 
-            return string.Join(",\n", tables.ToArray());
+            return tables.ToString();
+        }
+
+        internal static string FillTableTemplate(Entity entity)
+        {
+            StringBuilder tableSql = new StringBuilder();
+
+            // SQL Definitions
+            StringBuilder columns = new StringBuilder();
+            StringBuilder primaryKeys = new StringBuilder();
+            StringBuilder indexes = new StringBuilder();
+            StringBuilder foreignKeys = new StringBuilder();
+            StringBuilder defaults = new StringBuilder();
+
+            foreach (Property property in entity.Properties)
+            {
+                string propertySql = $"\r\n\t[{property.Name}] {property.SqlType}";
+
+                if (property.IsPrimaryKey)
+                {
+                    // If the property is a primary key, 99% it's gonna be the ID
+                    // which is always a number of some kind starting at 1
+                    propertySql += " IDENTITY(1,1) NOT FOR REPLICATION";
+
+                    Template primaryKeyT = GetNewTemplate(Templates["PrimaryKey"]);
+                    primaryKeyT.Add("TABLENAME", entity.TableName);
+                    primaryKeyT.Add("PKNAME", property.Name);
+
+                    primaryKeys.Append("\r\n");
+                    primaryKeys.Append(primaryKeyT.Render());
+                }
+
+                if (property.DefaultValue != null)
+                {
+                    Template defaultValueT = GetNewTemplate(Templates["DefaultValue"]);
+                    defaultValueT.Add("TABLENAME", entity.TableName);
+                    defaultValueT.Add("COLUMNNAME", property.Name);
+                    defaultValueT.Add("DEFAULTVALUE", property.DefaultValue);
+
+                    defaults.Append("\r\n");
+                    defaults.Append(defaultValueT.Render());
+                }
+
+                if (!property.IsNullable)
+                    propertySql += " NOT";
+                propertySql += " NULL";
+
+                columns.Append(propertySql + ",");
+            }
+
+            Template tableT = GetNewTemplate(Templates["Table"]);
+            tableT.Add("TABLENAME", entity.TableName);
+            tableT.Add("PROPERTIES", columns);
+            tableT.Add("PKCONSTRAINTS", primaryKeys);
+
+            tableSql.Append(tableT.Render());
+            tableSql.Append(defaults);
+
+            return tableSql.ToString();
         }
     }
 }

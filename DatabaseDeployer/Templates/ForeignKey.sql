@@ -1,0 +1,4 @@
+﻿ IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[[][[]]dbo].[[][[]]FK_~TABLENAME~_~TABLENAME2~_~FKNAME~]') AND parent_object_id = OBJECT_ID(N'[[][[]]dbo].[[][[]]~TABLENAME~]'))
+ALTER TABLE [[][[]]dbo].[[][[]]~TABLENAME~]  WITH CHECK ADD  CONSTRAINT [[][[]]FK_~TABLENAME~_~TABLENAME2~_~FKNAME~] FOREIGN KEY([[][[]]~FKNAME~])
+REFERENCES [[][[]]~TABLENAME2~] ([[][[]]ID]) IF  EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[[][[]]dbo].[[][[]]FK_~TABLENAME~_~TABLENAME2~_~FKNAME~]') AND parent_object_id = OBJECT_ID(N'[[][[]]dbo].[[][[]]~TABLENAME~]'))
+ALTER TABLE [[][[]]dbo].[[][[]]~TABLENAME~] CHECK CONSTRAINT [[][[]]FK_~TABLENAME~_~TABLENAME2~_~FKNAME~]
