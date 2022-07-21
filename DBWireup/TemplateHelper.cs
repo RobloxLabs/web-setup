@@ -250,22 +250,30 @@ namespace DBWireup
 
             StringBuilder columnList = new StringBuilder(); // Specific to Insert and Get
             StringBuilder setValues = new StringBuilder(); // Specific to Update
+            StringBuilder insertParamList = new StringBuilder(); // Specific to Insert
 
             StringBuilder result = new StringBuilder();
 
+            const string PREFIX = "\r\n\t";
+
             foreach (Property property in entity.Properties)
             {
-                columnList.AppendLine("[" + property.Name + "],");
+                columnList.Append($"{PREFIX}[{property.Name}],");
                 if (!property.IsPrimaryKey)
                 {
-                    setValues.AppendLine($"[{property.Name}] = {PARAM_PREFIX}{property.Name},");
+                    setValues.Append($"{PREFIX}[{property.Name}] = {PARAM_PREFIX}{property.Name},");
                 }
+                insertParamList.Append($"{PREFIX}{PARAM_PREFIX}{property.Name},");
             }
-            // HACK: Remove trailing commas
+            // HACK: Remove trailing commas & initial newlines
             if (columnList.Length > 0)
             {
-                columnList.Remove(columnList.Length - 3, 1); // Remove trailing comma >:(
-                setValues.Remove(setValues.Length - 3, 1);
+                columnList.Remove(columnList.Length - 1, 1); // Remove trailing comma >:(
+                columnList.Remove(0, 2); // Remove initial new line >:(
+                setValues.Remove(setValues.Length - 1, 1);
+                setValues.Remove(0, 2);
+                insertParamList.Remove(insertParamList.Length - 1, 1);
+                insertParamList.Remove(0, 2);
             }
 
             foreach (var procedure in entity.Procedures)
@@ -293,18 +301,19 @@ namespace DBWireup
                             // Default value for procedure parameter
                             string extra = "";
                                 
-                            if (property.DefaultValue != null)
+                            if (!string.IsNullOrEmpty(property.DefaultValue))
                             {
-                                extra += $" = {property.DefaultValue}";
                                 // Hack for binary sql types
                                 if (property.Type == "string" && !(property.SqlType.Contains("binary") || property.SqlType.Contains("BINARY")))
                                     extra += $" = \"{property.DefaultValue}\"";
+                                else
+                                    extra += $" = {property.DefaultValue}";
                             }
                             else if (property.IsNullable)
                                 extra += " = NULL";
 
-                            sqlInputParameterList.AppendLine($"{PARAM_PREFIX}{property.Name}\t\t\t\t{property.SqlType}{extra},");
-                            paramList.AppendLine($"[{property.Name}] = {PARAM_PREFIX + property.Name},");
+                            sqlInputParameterList.Append($"{PREFIX}{PARAM_PREFIX}{property.Name}\t\t\t\t{property.SqlType}{extra},");
+                            paramList.Append($"{PREFIX}[{property.Name}] = {PARAM_PREFIX + property.Name},");
                         }
                     }
                     else
@@ -312,11 +321,13 @@ namespace DBWireup
                         throw new NotImplementedException("Non-property-bound parameter support has not yet been implemented!");
                     }
                 }
-                // HACK: Remove trailing commas
+                // HACK: Remove trailing commas & initial newlines
                 if (procedure.Parameters.Count > 0)
                 {
-                    sqlInputParameterList.Remove(sqlInputParameterList.Length - 3, 1);
-                    paramList.Remove(paramList.Length - 3, 1);
+                    sqlInputParameterList.Remove(0, 2);
+                    sqlInputParameterList.Remove(sqlInputParameterList.Length - 1, 1);
+                    paramList.Remove(0, 2);
+                    paramList.Remove(paramList.Length - 1, 1);
                 }
 
                 Template template = GetNewTemplate(SqlTemplates["ProcedureType_" + procedure.Type.ToString()], entity);
@@ -324,7 +335,10 @@ namespace DBWireup
                 template.Add("TABLENAME", entity.TableName);
                 template.Add("PROCEDURE", procedure.GetName(entity.Name, entity.TableName));
                 template.Add("SQLINPUTPARAMETERLIST", sqlInputParameterList);
-                template.Add("SQLPARAMETERLIST", paramList); // Section where values in the table set
+                if (procedure.Type == ProcedureType.Insert)
+                    template.Add("SQLPARAMETERLIST", insertParamList);
+                else
+                    template.Add("SQLPARAMETERLIST", paramList); // Section where values in the table set
 
                 template.Add("COLUMNLIST", columnList); // Specific to Insert and Get
                 template.Add("SETVALUES", setValues); // Specific to Update
