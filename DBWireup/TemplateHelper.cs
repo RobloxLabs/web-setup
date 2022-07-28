@@ -227,7 +227,12 @@ namespace DBWireup
                         type = entity.GetProperty(param.Name).Type;
 
                     // Camel case parameter for method
-                    var argName = char.ToLowerInvariant(param.Name[0]) + param.Name.Substring(1);
+                    string argName;
+                    // HACK: ID is showing up as iD instead of id
+                    if (param.Name == "ID")
+                        argName = "id";
+                    else
+                        argName = char.ToLowerInvariant(param.Name[0]) + param.Name.Substring(1);
                     parameters.Add($"{type} {argName}");
 
                     string val;
