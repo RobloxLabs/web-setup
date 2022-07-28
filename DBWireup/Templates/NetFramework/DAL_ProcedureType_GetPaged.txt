@@ -1,0 +1,16 @@
+﻿~ACCESSIBILITY~ static ICollection<~IDTYPE~> ~PROCEDUREMETHOD~(~PARAMETERS~)
+{
+    ~PARAMETERVALIDATION~
+    ~if(!(NOPARAMS))~
+
+    var queryParameters = new List<SqlParameter>
+    {
+        ~QUERYPARAMETERS~
+    };
+    ~endif~
+
+    using (var database = new GuardedDatabase(~CONNECTIONSTRING~))
+    {
+        return database.GetIDCollection<~IDTYPE~>("[dbo].[~PROCEDURE~]", BuildDAL~if(!(NOPARAMS))~, queryParameters: queryParameters.ToArray()~endif~);
+    }
+}

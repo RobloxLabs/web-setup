@@ -1,13 +1,14 @@
-﻿         ~ACCESSIBILITY~ void Delete()
-        {
-            if (_ID == default(~IDTYPE~))
-                throw new ApplicationException("Required value not specified: ID.");
+﻿~ACCESSIBILITY~ void Delete()
+{
+    ~PARAMETERVALIDATION~
 
-            var queryParameters = new List<SqlParameter>
-            {
-                new SqlParameter("@ID", _ID)
-            };
+    var queryParameters = new List<SqlParameter>
+    {
+        ~QUERYPARAMETERS~
+    };
 
-            using var database = new GuardedDatabase(~CONNECTIONSTRING~);
-            database.Delete("[dbo].[~PROCEDURE~]", _ID);
-        }
+    using (var database = new GuardedDatabase(~CONNECTIONSTRING~))
+    {
+        database.Delete("[dbo].[~PROCEDURE~]", _ID);
+    }
+}

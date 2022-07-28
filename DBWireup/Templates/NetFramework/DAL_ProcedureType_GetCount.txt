@@ -1,0 +1,16 @@
+﻿~ACCESSIBILITY~ static ~IDTYPE~ ~PROCEDUREMETHOD~(~PARAMETERS~)
+{
+    ~PARAMETERVALIDATION~
+    ~if(!(NOPARAMS))~
+
+    var queryParameters = new List<SqlParameter>
+    {
+        ~QUERYPARAMETERS~
+    };
+    ~endif~
+
+    using (var database = new GuardedDatabase(~CONNECTIONSTRING~))
+    {
+        return database.GetCount<~IDTYPE~>("[dbo].[~PROCEDURE~]"~if(!(NOPARAMS))~, queryParameters: queryParameters.ToArray()~endif~);
+    }
+}

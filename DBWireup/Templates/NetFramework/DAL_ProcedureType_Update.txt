@@ -1,14 +1,14 @@
-﻿        ~ACCESSIBILITY~ void Update()
-        {
-            if (_ID == default(int))
-                throw new ApplicationException("Required value not specified: ID.");
+﻿~ACCESSIBILITY~ void ~PROCEDUREMETHOD~()
+{
+    ~PARAMETERVALIDATION~
 
-            var queryParameters = new List<SqlParameter>
-            {
-		        //new SqlParameter("@ID", _ID), // Not sure if this is needed here yet or not
-		        ~QUERYPARAMETERS~
-            };
+    var queryParameters = new List<SqlParameter>
+    {
+		~QUERYPARAMETERS~
+    };
 
-            using var database = new GuardedDatabase(~CONNECTIONSTRING~);
-            database.Update("[dbo].[~PROCEDURE~]", _ID, queryParameters: queryParameters.ToArray());
-        }
+    using (var database = new GuardedDatabase(~CONNECTIONSTRING~))
+    {
+        database.Update("[dbo].[~PROCEDURE~]", _ID, queryParameters: queryParameters.ToArray());
+    }
+}

@@ -10,10 +10,12 @@ namespace SetupCommon
         Delete,
         Insert,
         Update,
+
+        // Everything here and onwards will utilize method parameters
+        // instead of directly accessing the properties
         Get,
         GetOrCreate,
         GetPaged,
-        GetTotal,
         GetCount,
         MultiGet
     }

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Xml;
 using System.Xml.Serialization;
-using System.Linq;
 
 namespace SetupCommon
 {
@@ -53,78 +52,98 @@ namespace SetupCommon
             }
         }
         
+        /// <summary>
+        /// The parameters for the procedure. Needs to be a List to allow for
+        /// proper appending of parameters.
+        /// </summary>
         [XmlArray]
         public List<Parameter> Parameters { get; set; }
 
         /// <summary>
-        /// Gets the fully qualified name for the procedure
+        /// Returns whether or not the current procedure is a required CRUD procedure
         /// </summary>
-        /// <param name="entityName">The name of the entity</param>
-        /// <param name="entityNamePlural">The plural name of the entity</param>
-        /// <returns></returns>
-        public string GetName(string entityName, string entityNamePlural = null)
+        /// <returns>Whether the current procedure is a required CRUD procedure</returns>
+        public bool IsPrimaryProcedure()
         {
-            var result = "";
-            if (IsPluralType(Type))
-                result += string.Format(GetPrefix(), entityNamePlural);
-            else
-                result += string.Format(GetPrefix(), entityName, GetSuffix());
-            return result;
+            // CRUD (Create Read Update Delete)
+            return Type == ProcedureType.Insert ||
+                   Type == ProcedureType.Get ||
+                   Type == ProcedureType.Update ||
+                   Type == ProcedureType.Delete;
         }
 
-        protected string GetPrefix()
+        /// <summary>
+        /// Gets the fully qualified name for the SQL procedure
+        /// </summary>
+        /// <param name="entity">The entity who owns the procedure</param>
+        /// <returns></returns>
+        public string GetNameSql(Entity entity)
         {
             switch (Type)
             {
                 case ProcedureType.GetPaged:
                     // Get{AccountRoleSet}IDs{ByAccountID}_Paged
-                    return "Get{0}IDs{1}_Paged";
-                case ProcedureType.GetTotal:
-                    // GetTotalNumberOf{AccountRoleSets}
-                    return "GetTotalNumberOf{0}";
+                    return $"Get{entity.Name}IDs{GetSuffix()}_Paged";
+                case ProcedureType.GetCount:
+                    // GetTotalNumberOf{AssetHashScripts}{ByAssetHashID}
+                    return $"GetTotalNumberOf{entity.TableName}{GetSuffix()}";
                 case ProcedureType.MultiGet:
-                    // Get{RecentItemLists}By{ID}s
-                    return "Get{0}By{1}s"; // Only meant for one parameter
+                    // Get{RecentItemLists}{ByID}s
+                    return $"Get{entity.TableName}{GetSuffix()}s"; // Only meant for one parameter
                 default:
                     // Get{AccountRoleSet}{ByID}
-                    return Type.ToString() + "{0}{1}";
+                    return Type.ToString() + $"{entity.Name}{GetSuffix()}";
             }
+        }
+
+        /// <summary>
+        /// Gets the DAL method name for the procedure
+        /// </summary>
+        /// <param name="entity">The entity who owns the procedure</param>
+        /// <returns></returns>
+        public string GetNameDal(Entity entity)
+        {
+            if (IsPrimaryProcedure())
+            {
+                // Procedure qualifies for method name size reduction
+                if (Type == ProcedureType.Insert ||
+                    (Parameters.Count == 1 &&
+                    Parameters[0].Name == "ID"))
+                {
+                    /*
+                     * Rather than doing something like GetByID, UpdateByID, or InsertByIDAndNameAndCreatedAndUpdated,
+                     * just do Get, Update, and Insert
+                     */
+                    return Type.ToString();
+                }
+            }
+
+            return GetNameSql(entity).Replace("_", "");
         }
 
         protected string GetSuffix()
         {
             var result = "";
+            IList<string> paramNames = new List<string>();
 
-            if (Parameters.Count != 0)
+            // Just InsertSale, no InsertSaleByAllColumns
+            if (Parameters.Count != 0 ||
+                Type != ProcedureType.Insert)
             {
-                result += "By";
-                foreach (var item in Parameters.Select((value, i) => new { i, value }))
+                foreach (var param in Parameters)
                 {
-                    if (item.i > 0)
-                        result += "And";
-                    result += item.value.Name;
+                    if (param.IsPropertyBound)
+                        paramNames.Add(param.Name);
+                }
+
+                if (paramNames.Count > 0)
+                {
+                    result += "By";
+                    result += string.Join("And", paramNames);
                 }
             }
 
             return result;
-        }
-
-        /// <summary>
-        /// Gets whether or not the ProcedureType needs a plural version of the entity name
-        /// </summary>
-        /// <param name="type">The procedure type</param>
-        /// <returns>Whether or not the ProcedureType needs a plural version of the entity name</returns>
-        public static bool IsPluralType(ProcedureType type)
-        {
-            switch (type)
-            {
-                case ProcedureType.GetTotal:
-                    return true;
-                case ProcedureType.MultiGet:
-                    return true;
-                default:
-                    return false;
-            }
         }
     }
 }

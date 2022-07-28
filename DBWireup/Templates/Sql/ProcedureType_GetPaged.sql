@@ -1,14 +1,14 @@
-﻿/* Standard Update */
+﻿/* Paged Get */
 IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[~PROCEDURE~]') AND type in (N'P', N'PC'))
 BEGIN
 	EXEC('CREATE PROCEDURE [dbo].[~PROCEDURE~] AS BEGIN SET NOCOUNT ON; END')
 END
-
 SET ANSI_NULLS ON
 GO
 
-SET QUOTED_IDENTIFIER OFF
+SET QUOTED_IDENTIFIER ON
 GO
+
 
 ALTER PROCEDURE [dbo].[~PROCEDURE~]
 (
@@ -18,14 +18,24 @@ AS
 
 SET NOCOUNT ON
 
-UPDATE
-	[~TABLENAME~]
-SET
-	~SETVALUES~
-WHERE
+
+DECLARE @Offset [int] = (@StartRowIndex-1)*@MaximumRows
+
+IF (@Offset < 1)
+BEGIN
+    SET @Offset = 0;
+END
+
+SELECT
+    [ID]
+FROM
+    [dbo].[~TABLENAME~]
+~if(!(NOPARAMS))~WHERE
 (
-	~SQLPARAMETERLIST~
-)
+    ~SQLPARAMETERLIST~
+)~endif~
+ORDER BY [ID]
+OFFSET @Offset ROWS FETCH NEXT @MaximumRows ROWS ONLY
 
 SET NOCOUNT OFF
 

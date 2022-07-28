@@ -1,18 +1,14 @@
-﻿        ~ACCESSIBILITY~ static ~DALCLASSNAME~ Get(~PARAMETERS~)
-        {
-            ~PARAMETERVALIDATION~
+﻿~ACCESSIBILITY~ static ~DALCLASSNAME~ ~PROCEDUREMETHOD~(~PARAMETERS~)
+{
+    ~PARAMETERVALIDATION~
 
-            var queryParameters = new List<SqlParameter>
-            {
-                ~QUERYPARAMETERS~
-            };
+    var queryParameters = new List<SqlParameter>
+    {
+        ~QUERYPARAMETERS~
+    };
 
-            var dbInfo = new dbInfo(
-                ~CONNECTIONSTRING~,
-                "~GETPROCEDURE~",
-                queryParameters
-            );
-
-            using var database = new GuardedDatabase(~CONNECTIONSTRING~);
-            database.Update("[dbo].[~PROCEDURE~]", BuildDAL, queryParameters: queryParameters.ToArray());
-        }
+    using (var database = new GuardedDatabase(~CONNECTIONSTRING~))
+    {
+        return database.Get("[dbo].[~PROCEDURE~]", BuildDAL, queryParameters: queryParameters.ToArray());
+    }
+}

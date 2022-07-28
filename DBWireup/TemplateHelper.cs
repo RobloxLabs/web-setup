@@ -69,7 +69,8 @@ namespace DBWireup
                 template.Add("ENTITYNAME", entity.Name);
                 template.Add("DALCLASSNAME", $"{entity.Name}DAL");
                 template.Add("ACCESSIBILITY", entity.IsInternal ? "internal" : "public");
-                template.Add("IDTYPE", entity.Properties[0].Type);
+                template.Add("IDTYPE", entity.GetIDProperty().Type);
+                template.Add("SQLIDTYPE", entity.GetIDProperty().SqlType); // Specific to Insert
             }
 
             return template;
@@ -115,6 +116,16 @@ namespace DBWireup
             return template.Render();
         }
 
+        private static string GetDefaultForType(string type)
+        {
+            string typeDefault = $"default({type})";
+            if (type.ToLower() == "string")
+                typeDefault = "string.Empty";
+            else if (type == "DateTime")
+                typeDefault = "DateTime.MinValue";
+            return typeDefault;
+        }
+
         /// <summary>
         /// Fills out the NetFramework/Biz.txt template.
         /// </summary>
@@ -158,7 +169,7 @@ namespace DBWireup
                 }*/
             }
 
-            Template template = GetNewTemplate(NetFrameworkTemplates["Biz"], entity);
+            Template template = GetNewTemplate(NetFrameworkTemplates["BIZ"], entity);
             template.Add("CLASSNAME", $"{entity.Name}DAL");
             template.Add("BIZCLASSNAME", entity.Name);
             template.Add("BIZREMOTECACHEABLE", ""); // Maybe should do something with this
@@ -178,49 +189,73 @@ namespace DBWireup
         /// <param name="entity"></param>
         internal static string FillDalTemplate(Entity entity, string connectionStringValue)
         {
-            List<string> dalFields = new List<string>();
-            List<string> dalProperties = new List<string>();
-            List<string> queryParameters = new List<string>();
-            List<string> readerParameters = new List<string>();
-            List<string> paramFunctions = new List<string>();
+            IList<string> dalFields = new List<string>();
+            IList<string> dalProperties = new List<string>();
+            IList<string> readerParameters = new List<string>();
+            IList<string> paramFunctions = new List<string>();
             string connectionStringPropName = $"dbConnectionString_{entity.Name}DAL"; // Config.ConnectionStringPropertyName
+            const string LINE_PREFIX_1 = ",\r\n";
+            const string LINE_PREFIX_2 = "\r\n";
 
+            // Prep DAL template //
             foreach (Property property in entity.Properties)
             {
-                if (!property.IsPrimaryKey)
-                {
-                    string typeDefault = $"default({property.Type})";
-                    if (property.Type.ToLower() == "string")
-                        typeDefault = "string.Empty";
-                    else if (property.Type == "DateTime")
-                        typeDefault = "DateTime.MinValue";
+                string typeDefault = GetDefaultForType(property.Type);
 
-                    dalFields.Add($"private {property.Type} _{property.Name} = {typeDefault};");
-                    dalProperties.Add($"{(entity.IsInternal ? "internal" : "public")} {property.Type} {property.Name}\n" +
-                                        $"{{\n" +
-                                        $"    get {{ return _{property.Name}; }}\n" +
-                                        $"    set {{ _{property.Name} = value; }}\n" +
-                                        $"}}"
-                    );
+                dalFields.Add($"private {property.Type} _{property.Name} = {typeDefault};");
+                dalProperties.Add($"{(entity.IsInternal ? "internal" : "public")} {property.Type} {property.Name}\r\n" +
+                                    $"{{\r\n" +
+                                    $"    get {{ return _{property.Name}; }}\r\n" +
+                                    $"    set {{ _{property.Name} = value; }}\r\n" +
+                                    $"}}"
+                );
 
-                    queryParameters.Add($"new SqlParameter(\"{PARAM_PREFIX}{property.Name}\", _{property.Name})");
-                    readerParameters.Add($"dal.{property.Name} = ({property.Type})reader[\"{property.Name}\"];");
-
-                    /*if (property.IsForeignKey)
-                    {
-                        Template paramFunction = GetNewTemplate(NetFrameworkTemplates["DalGetByFK"], entity);
-                        paramFunction.Add("CLASSNAME", entity.Name);
-                        paramFunction.Add("FKPROPERTYNAME", property.Name);
-                        paramFunction.Add("FKIDTYPE", property.Type);
-                        paramFunction.Add("GETBYPROPERTYPROCEDURE", GetGetByPropertyProcedure(entity, property));
-                        paramFunction.Add("CONNECTIONSTRING", connectionStringPropName);
-
-                        paramFunctions.Add(paramFunction.Render());
-                    }*/
-                }
+                readerParameters.Add($"dal.{property.Name} = ({property.Type})reader[\"{property.Name}\"];");
             }
 
-            Template template = GetNewTemplate(NetFrameworkTemplates["Dal"], entity);
+            // DAL Procedure templates //
+            foreach (Procedure procedure in entity.Procedures)
+            {
+                IList<string> parameters = new List<string>();
+                IList<string> parameterValidation = new List<string>();
+                IList<string> queryParameters = new List<string>();
+
+                foreach (Parameter param in procedure.Parameters)
+                {
+                    var type = param.Type;
+                    if (param.IsPropertyBound)
+                        type = entity.GetProperty(param.Name).Type;
+
+                    // Camel case parameter for method
+                    var argName = char.ToLowerInvariant(param.Name[0]) + param.Name.Substring(1);
+                    parameters.Add($"{type} {argName}");
+
+                    string val;
+                    // Determine if we're referencing the property directly,
+                    // or if we're using an argument from the current method instead
+                    if ((int)procedure.Type >= (int)ProcedureType.Get)
+                        val = argName;
+                    else
+                        val = $"_{ param.Name}";
+
+                    parameterValidation.Add($"if ({val} == {GetDefaultForType(type)}){LINE_PREFIX_2 + "\t"}throw new ApplicationException(\"Required value not specified: {param.Name}.\");");
+                    queryParameters.Add($"new SqlParameter(\"{PARAM_PREFIX}{param.Name}\", {val})");
+                }
+
+                Template procedureT = GetNewTemplate(NetFrameworkTemplates["DAL_ProcedureType_" + procedure.Type.ToString()], entity);
+                procedureT.Add("PARAMETERS", string.Join(", ", parameters));
+                procedureT.Add("PARAMETERVALIDATION", string.Join(LINE_PREFIX_2, parameterValidation));
+                procedureT.Add("QUERYPARAMETERS", string.Join(LINE_PREFIX_1, queryParameters));
+                procedureT.Add("CONNECTIONSTRING", connectionStringPropName);
+                procedureT.Add("PROCEDURE", procedure.GetNameSql(entity));
+                procedureT.Add("PROCEDUREMETHOD", procedure.GetNameDal(entity));
+                procedureT.Add("NOPARAMS", parameters.Count == 0);
+
+                paramFunctions.Add(procedureT.Render());
+            }
+
+            // DAL Template //
+            Template template = GetNewTemplate(NetFrameworkTemplates["DAL"], entity);
             // A hack for the Roblox Server Class Library
             if (entity.EntityNamespace == "Roblox")
             {
@@ -229,77 +264,62 @@ namespace DBWireup
             }
             template.Add("CONNECTIONSTRING", connectionStringPropName);
             template.Add("CONNECTIONSTRINGVALUE", connectionStringValue);
-            template.Add("DELETEPROCEDURE", GetDeleteProcedure(entity) + "ByID");
-            template.Add("INSERTPROCEDURE", GetInsertProcedure(entity));
-            template.Add("UPDATEPROCEDURE", GetUpdateProcedure(entity) + "ByID");
-            template.Add("GETPROCEDURE", GetGetProcedure(entity) + "ByID");
-            template.Add("IDSQLDBTYPE", entity.Properties[0].SqlType);
-            template.Add("DALFIELDS", string.Join("\n", dalFields.ToArray()));
-            template.Add("DALPROPERTIES", string.Join("\n", dalProperties.ToArray()));
-            template.Add("QUERYPARAMETERS", string.Join(",\n", queryParameters.ToArray()));
-            template.Add("READERPARAMETERS", string.Join("\n", readerParameters.ToArray()));
-            template.Add("PARAMFUNCTIONS", string.Join("\n", paramFunctions.ToArray()));
+            template.Add("IDSQLDBTYPE", entity.GetIDProperty().SqlType);
+            template.Add("DALFIELDS", string.Join(LINE_PREFIX_2, dalFields));
+            template.Add("DALPROPERTIES", string.Join(LINE_PREFIX_2, dalProperties));
+            template.Add("READERPARAMETERS", string.Join(LINE_PREFIX_2, readerParameters));
+            template.Add("PARAMFUNCTIONS", string.Join(LINE_PREFIX_2, paramFunctions));
 
             return template.Render();
         }
 
+        /// <summary>
+        /// Fills the SQL table script template with data based on
+        /// the given entity.
+        /// </summary>
+        /// <param name="entity">The entity to create the SQL table for</param>
+        /// <returns></returns>
         internal static string FillSqlTemplate(Entity entity)
         {
-            StringBuilder sqlInputParameterList; // Procedure params
-            StringBuilder paramList; // Section where values in the table are matched up to the parameters
+            IList<string> sqlInputParameterList; // Procedure params
+            IList<string> paramList; // Section where values in the table are matched up to the parameters
 
-            StringBuilder columnList = new StringBuilder(); // Specific to Insert and Get
-            StringBuilder setValues = new StringBuilder(); // Specific to Update
-            StringBuilder insertParamList = new StringBuilder(); // Specific to Insert
+            IList<string> columnList = new List<string>(); // Specific to Insert and Get
+            IList<string> setValues = new List<string>(); // Specific to Update
+            IList<string> insertParamList = new List<string>(); // Specific to Insert
 
             StringBuilder result = new StringBuilder();
 
-            const string PREFIX = "\r\n\t";
+            const string LINE_PREFIX = ",\r\n";
 
             foreach (Property property in entity.Properties)
             {
-                columnList.Append($"{PREFIX}[{property.Name}],");
+                columnList.Add($"[{property.Name}]");
                 if (!property.IsPrimaryKey)
                 {
-                    setValues.Append($"{PREFIX}[{property.Name}] = {PARAM_PREFIX}{property.Name},");
+                    setValues.Add($"[{property.Name}] = {PARAM_PREFIX}{property.Name}");
                 }
-                insertParamList.Append($"{PREFIX}{PARAM_PREFIX}{property.Name},");
-            }
-            // HACK: Remove trailing commas & initial newlines
-            if (columnList.Length > 0)
-            {
-                columnList.Remove(columnList.Length - 1, 1); // Remove trailing comma >:(
-                columnList.Remove(0, 2); // Remove initial new line >:(
-                setValues.Remove(setValues.Length - 1, 1);
-                setValues.Remove(0, 2);
-                insertParamList.Remove(insertParamList.Length - 1, 1);
-                insertParamList.Remove(0, 2);
+                insertParamList.Add($"{PARAM_PREFIX}{property.Name}");
             }
 
             foreach (var procedure in entity.Procedures)
             {
-                sqlInputParameterList = new StringBuilder();
-                paramList = new StringBuilder();
+                sqlInputParameterList = new List<string>();
+                paramList = new List<string>();
 
                 foreach (var param in procedure.Parameters)
                 {
+                    string type = param.SqlType;
+                    // Default value for procedure parameter
+                    string extra = "";
                     if (param.IsPropertyBound)
                     {
                         // Find matching property
-                        Property property = null;
-                        foreach (var prop in entity.Properties)
-                        {
-                            if (prop.Name == param.Name)
-                            {
-                                property = prop;
-                                break;
-                            }
-                        }
+                        Property property = entity.GetProperty(param.Name);
 
                         if (property != null)
                         {
-                            // Default value for procedure parameter
-                            string extra = "";
+                            type = property.SqlType;
                                 
                             if (!string.IsNullOrEmpty(property.DefaultValue))
                             {
@@ -312,36 +332,35 @@ namespace DBWireup
                             else if (property.IsNullable)
                                 extra += " = NULL";
 
-                            sqlInputParameterList.Append($"{PREFIX}{PARAM_PREFIX}{property.Name}\t\t\t\t{property.SqlType}{extra},");
-                            paramList.Append($"{PREFIX}[{property.Name}] = {PARAM_PREFIX + property.Name},");
+                            paramList.Add($"[{property.Name}] = {PARAM_PREFIX + param.Name}");
                         }
                     }
                     else
                     {
-                        throw new NotImplementedException("Non-property-bound parameter support has not yet been implemented!");
+                        //throw new NotImplementedException("Non-property-bound parameter support has not yet been implemented!");
                     }
-                }
-                // HACK: Remove trailing commas & initial newlines
-                if (procedure.Parameters.Count > 0)
-                {
-                    sqlInputParameterList.Remove(0, 2);
-                    sqlInputParameterList.Remove(sqlInputParameterList.Length - 1, 1);
-                    paramList.Remove(0, 2);
-                    paramList.Remove(paramList.Length - 1, 1);
+                    sqlInputParameterList.Add($"{PARAM_PREFIX}{param.Name}\t\t\t\t{type}{extra}");
                 }
 
                 Template template = GetNewTemplate(SqlTemplates["ProcedureType_" + procedure.Type.ToString()], entity);
-                template.Add("SQLIDTYPE", entity.Properties[0].SqlType); // Specific Insert
                 template.Add("TABLENAME", entity.TableName);
-                template.Add("PROCEDURE", procedure.GetName(entity.Name, entity.TableName));
-                template.Add("SQLINPUTPARAMETERLIST", sqlInputParameterList);
+                template.Add("PROCEDURE", procedure.GetNameSql(entity));
+                template.Add("SQLINPUTPARAMETERLIST", string.Join(LINE_PREFIX, sqlInputParameterList));
+                var empty = true;
                 if (procedure.Type == ProcedureType.Insert)
-                    template.Add("SQLPARAMETERLIST", insertParamList);
+                {
+                    template.Add("SQLPARAMETERLIST", string.Join(LINE_PREFIX, insertParamList));
+                    empty = insertParamList.Count == 0;
+                }
                 else
-                    template.Add("SQLPARAMETERLIST", paramList); // Section where values in the table set
+                {
+                    template.Add("SQLPARAMETERLIST", string.Join(LINE_PREFIX, paramList)); // Section where values in the table are set
+                    empty = paramList.Count == 0;
+                }
+                template.Add("NOPARAMS", empty);
 
-                template.Add("COLUMNLIST", columnList); // Specific to Insert and Get
-                template.Add("SETVALUES", setValues); // Specific to Update
+                template.Add("COLUMNLIST", string.Join(LINE_PREFIX, columnList)); // Specific to Insert and Get
+                template.Add("SETVALUES", string.Join(LINE_PREFIX, setValues)); // Specific to Update
 
                 result.AppendLine(template.Render());
             }

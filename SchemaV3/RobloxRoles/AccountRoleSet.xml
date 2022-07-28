@@ -35,6 +35,14 @@
 		</Parameters>
 	</Procedure>
 	
+	<!-- Gets the AccountRoleSet for the given AccountID with the given RoleSetID -->
+	<Procedure Type="Get">
+		<Parameters>
+			<Parameter Name="AccountID" />
+			<Parameter Name="RoleSetID" />
+		</Parameters>
+	</Procedure>
+	
 	<!-- Gets all AccountRoleSet IDs -->
 	<Procedure Type="GetPaged" />
 	
@@ -53,7 +61,7 @@
 	</Procedure>
 	
 	<!-- Gets a count of all AccountRoleSets in the table -->
-	<Procedure Type="GetTotal" />
+	<Procedure Type="GetCount" />
 	
   </Procedures>
 </Entity>

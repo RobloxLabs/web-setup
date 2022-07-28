@@ -4,19 +4,16 @@ using System.Data;
 using System.Data.SqlClient;
 using Roblox.Common;
 using Roblox.Common.Persistence;
+using Roblox.Mssql;
 
 namespace ~NAMESPACE~
 {
     ~ACCESSIBILITY~ class ~DALCLASSNAME~
     {
-        private ~IDTYPE~ _ID = default(~IDTYPE~);
-~DALFIELDS~
-        ~ACCESSIBILITY~ ~IDTYPE~ ID
-        {
-            get { return _ID; }
-            set { _ID = value; } 
-        }
-~DALPROPERTIES~
+        ~DALFIELDS~
+
+        ~DALPROPERTIES~
+
         private static string ~CONNECTIONSTRING~
         {
             get { return ~CONNECTIONSTRINGVALUE~; }
@@ -32,7 +29,6 @@ namespace ~NAMESPACE~
 
             while (reader.Read())
             {
-                dal.ID = (~IDTYPE~)reader["ID"];
 		        ~READERPARAMETERS~
             }
 
