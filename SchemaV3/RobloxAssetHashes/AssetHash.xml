@@ -1,0 +1,91 @@
+<?xml version="1.0"?>
+<Entity Name="AssetHash" Table="AssetHashes">
+  <!-- The properties of the entity. This is all a rough estimate. -->
+  <Properties>
+	<Property Name="ID" Type="long" SqlType="BIGINT" IsPrimaryKey="true" IsReadOnly="true" />
+    <Property Name="AssetTypeID" Type="int" SqlType="INT" />
+    <Property Name="IsApproved" Type="bool" SqlType="BIT" />
+	<!--
+		While this was most likely actually here, it's rediculously inefficient to have.
+		Why store the hash in both the RobloxFiles.Files table *and* in the asset hash table??
+		Just reference the File ID...
+	-->
+	<!--Property Name="Hash" Type="string" SqlType="VARCHAR(32)" /-->
+	<Property Name="HashID" Type="long" SqlType="BigInt" />
+	<Property Name="CreatorID" Type="int" SqlType="INT" />
+    <Property Name="Created" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadOnly="true" />
+    <Property Name="Updated" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadOnly="true" />
+  </Properties>
+  
+  <!-- The SQL procedures for the entity -->
+  <Procedures>
+	<!-- Deletes the entity with the given ID -->
+	<Procedure Type="Delete">
+		<Parameters>
+			<Parameter Name="ID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Gets the entity with the given ID -->
+	<Procedure Type="Get">
+		<Parameters>
+			<Parameter Name="ID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Gets the AssetHash by AssetTypeID and HashID -->
+	<Procedure Type="Get">
+		<Parameters>
+			<Parameter Name="AssetTypeID" />
+			<Parameter Name="HashID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Inserts the entity into the table -->
+	<Procedure Type="Insert" />
+	
+	<!-- Updates the entity with the given ID -->
+	<Procedure Type="Update">
+		<Parameters>
+			<Parameter Name="ID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Gets all AssetHash IDs by HashID -->
+	<Procedure Type="GetPaged">
+		<Parameters>
+			<Parameter Name="HashID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Gets all AssetHash IDs by AssetTypeID -->
+	<Procedure Type="GetPaged">
+		<Parameters>
+			<Parameter Name="AssetTypeID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Gets or creates an AssetHash by AssetType and Hash -->
+	<!--Procedure Type="GetOrCreate">
+		<Parameters>
+			<Parameter Name="AssetTypeID" />
+			<Parameter Name="HashID" />
+		</Parameters>
+	</Procedure-->
+	
+	<!-- Gets the total number of AssetHashes by AssetTypeID -->
+	<Procedure Type="GetCount">
+		<Parameters>
+			<Parameter Name="AssetTypeID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Gets the total number of AssetHashes by HashID -->
+	<Procedure Type="GetCount">
+		<Parameters>
+			<Parameter Name="HashID" />
+		</Parameters>
+	</Procedure>
+	
+  </Procedures>
+</Entity>

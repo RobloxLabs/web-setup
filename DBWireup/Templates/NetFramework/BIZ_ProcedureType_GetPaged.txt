@@ -1,0 +1,17 @@
+﻿~ACCESSIBILITY~ static ICollection<~BIZCLASSNAME~> ~PROCEDUREMETHOD~(~PARAMETERS~)
+{
+    return EntityHelper.GetEntityCollection<AccountRoleSet, int>(
+        EntityCacheInfo,
+        ~if(UNQUALIFIED)~
+        CacheManager.UnqualifiedNonExpiringCachePolicy,
+        ~else~
+        new CacheManager.CachePolicy(
+            CacheManager.CacheScopeFilter.Qualified,
+            $"~CACHELOOKUP~"
+        ),
+        ~endif~
+        $"~COLLECTIONID~",
+        () => ~DALCLASSNAME~.~DALPROCEDUREMETHOD~(~if(!NOPARAMS)~~DALPARAMS~, ~endif~startRowIndex + 1, maximumRows),
+        Get
+    );
+}

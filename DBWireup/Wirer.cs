@@ -74,8 +74,8 @@ namespace DBWireup
 
                         foreach (Entity entity in database.Entities)
                         {
-                            /*try
-                            {*/
+                            try
+                            {
                                 // Create the entity out directory if it doesn't exist already
                                 string entityOutDirectory = Path.Combine(databaseOutDirectory, entity.Name);
                                 if (!Directory.Exists(entityOutDirectory))
@@ -85,9 +85,6 @@ namespace DBWireup
                                 File.WriteAllText(Path.Combine(entityOutDirectory, $"I{entity.Name}.cs"),
                                     TemplateHelper.FillInterfaceTemplate(entity)
                                 );
-                                /*File.WriteAllText(Path.Combine(entityOutDirectory, $"{entity.Name}.cs"),
-                                    TemplateHelper.FillBizTemplate(entity)
-                                );*/
                                 File.WriteAllText(Path.Combine(entityOutDirectory, $"{entity.Name}DAL.cs"),
                                     TemplateHelper.FillDalTemplate(entity,
                                         Config.UseConnectionStringReference ?
@@ -98,17 +95,21 @@ namespace DBWireup
                                             ) + '"'
                                     )
                                 );
+                            
+                                File.WriteAllText(Path.Combine(entityOutDirectory, $"{entity.Name}.cs"),
+                                    TemplateHelper.FillBizTemplate(entity)
+                                );
 
                                 if (Config.DoProcedureWireup)
                                 {
                                     // Create SQL procedures in DB
                                     server.ConnectionContext.ExecuteNonQuery(TemplateHelper.FillSqlTemplate(entity));
                                 }
-                            /*}
+                            }
                             catch (Exception ex)
                             {
                                 Console.WriteLine($"Failed to wireup {entity.Name}! Reason: {ex.Message}");
-                            }*/
+                            }
                         }
                     }
 

@@ -68,37 +68,13 @@ namespace DBWireup
                 template.Add("NAMESPACE", entity.EntityNamespace);
                 template.Add("ENTITYNAME", entity.Name);
                 template.Add("DALCLASSNAME", $"{entity.Name}DAL");
+                template.Add("BIZCLASSNAME", entity.Name);
                 template.Add("ACCESSIBILITY", entity.IsInternal ? "internal" : "public");
                 template.Add("IDTYPE", entity.GetIDProperty().Type);
                 template.Add("SQLIDTYPE", entity.GetIDProperty().SqlType); // Specific to Insert
             }
 
             return template;
-        }
-
-        private static string GetGetProcedure(Entity entity)
-        {
-            return $"{entity.TableName}_Get{entity.Name}";
-        }
-
-        private static string GetGetByPropertyProcedure(Entity entity, Property property)
-        {
-            return $"{GetGetProcedure(entity)}IDsBy{property.Name}";
-        }
-
-        private static string GetInsertProcedure(Entity entity)
-        {
-            return $"{entity.TableName}_Insert{entity.Name}";
-        }
-
-        private static string GetUpdateProcedure(Entity entity)
-        {
-            return $"{entity.TableName}_Update{entity.Name}";
-        }
-
-        private static string GetDeleteProcedure(Entity entity)
-        {
-            return $"{entity.TableName}_Delete{entity.Name}";
         }
 
         internal static string FillInterfaceTemplate(Entity entity)
@@ -133,27 +109,29 @@ namespace DBWireup
         /// <returns>Filled template</returns>
         internal static string FillBizTemplate(Entity entity)
         {
-            string bizProperties = "";
+            List<string> bizProperties = new List<string>();
             List<string> createNewParams = new List<string>();
             List<string> createNewPropertySetters = new List<string>();
             List<string> paramFunctions = new List<string>();
             List<string> stateTokenCollection = new List<string>();
+            const string LINE_PREFIX = "\r\n";
 
+            // Prep BIZ Template //
             foreach (Property property in entity.Properties)
             {
-                // Property definition
-                bizProperties += $"public {property.Type} {property.Name}\n{{\n";
-                // Append getter
-                bizProperties += $"\tget {{ return _EntityDAL.{property.Name};  }}\n";
-                if (!property.IsReadonly)
+                string bizProp = $"public {property.Type} {property.Name}" + LINE_PREFIX +
+                    $"{{\r\n" +
+                    $"    get {{ return _EntityDAL.{property.Name}; }}" + LINE_PREFIX;
+                if (!property.IsReadOnly)
                 {
                     // Append setter
-                    bizProperties += $"\tset {{ _EntityDAL.{property.Name} = value;  }}\n";
-                    // ID doesn't have a setter
-                    createNewParams.Add($"{property.Type} {property.Name.ToLower()}");
-                    createNewPropertySetters.Add($"entity.{property.Name} = {property.Name.ToLower()};");
+                    bizProp += $"\tset {{ _EntityDAL.{property.Name} = value; }}" + LINE_PREFIX;
+                    string argName = CamelCaseString(property.Name);
+                    createNewParams.Add($"{property.Type} {argName}");
+                    createNewPropertySetters.Add($"entity.{property.Name} = {argName};");
                 }
-                bizProperties += "}\n";
+                bizProp += "}" + LINE_PREFIX;
+                bizProperties.Add(bizProp);
 
                 // This is only for foreign keys!!
                 /*if (property.IsForeignKey)
@@ -169,9 +147,54 @@ namespace DBWireup
                 }*/
             }
 
+            // BIZ Procedure templates //
+            foreach (Procedure procedure in entity.Procedures)
+            {
+                if ((int)procedure.Type > (int)ProcedureType.Update)
+                {
+                    IList<string> parameters = new List<string>();
+                    IList<string> arguments = new List<string>();
+                    IList<string> cacheLookup = new List<string>();
+                    IList<string> collectionId = new List<string> { procedure.GetNameBiz(entity) };
+
+                    foreach (Parameter param in procedure.Parameters)
+                    {
+                        var type = param.Type;
+                        if (param.IsPropertyBound)
+                            type = entity.GetProperty(param.Name).Type;
+
+                        string argName = CamelCaseString(param.Name);
+                        parameters.Add($"{type} {argName}");
+                        if (!(procedure.Type == ProcedureType.GetPaged && !param.IsPropertyBound))
+                        {
+                            arguments.Add(argName);
+                        }
+                        if (param.IsPropertyBound)
+                            cacheLookup.Add($"{param.Name}:{{{argName}}}");
+                        collectionId.Add($"{param.Name}:{{{argName}}}");
+                    }
+
+                    Template procedureT = GetNewTemplate(NetFrameworkTemplates["BIZ_ProcedureType_" + procedure.Type.ToString()], entity);
+                    procedureT.Add("PARAMETERS", string.Join(", ", parameters));
+                    procedureT.Add("DALPARAMS", string.Join(", ", arguments));
+                    procedureT.Add("PROCEDURE", procedure.GetNameSql(entity));
+                    procedureT.Add("PROCEDUREMETHOD", procedure.GetNameBiz(entity));
+                    procedureT.Add("DALPROCEDUREMETHOD", procedure.GetNameDal(entity));
+                    procedureT.Add("NOPARAMS", arguments.Count == 0);
+                    procedureT.Add("UNQUALIFIED", cacheLookup.Count == 0);
+
+                    if (procedure.Type == ProcedureType.Get)
+                        procedureT.Add("IDONLY", procedure.Parameters.Count == 1 && procedure.Parameters[0].Name == "ID");
+
+                    procedureT.Add("CACHELOOKUP", string.Join("_", cacheLookup));
+                    procedureT.Add("COLLECTIONID", string.Join("_", collectionId));
+
+                    paramFunctions.Add(procedureT.Render());
+                }
+            }
+
+            // BIZ Template //
             Template template = GetNewTemplate(NetFrameworkTemplates["BIZ"], entity);
-            template.Add("CLASSNAME", $"{entity.Name}DAL");
-            template.Add("BIZCLASSNAME", entity.Name);
             template.Add("BIZREMOTECACHEABLE", ""); // Maybe should do something with this
             template.Add("BIZREMOTECACHEABLEREGION", ""); // This too
             template.Add("BIZPROPERTIES", bizProperties);
@@ -203,10 +226,10 @@ namespace DBWireup
                 string typeDefault = GetDefaultForType(property.Type);
 
                 dalFields.Add($"private {property.Type} _{property.Name} = {typeDefault};");
-                dalProperties.Add($"{(entity.IsInternal ? "internal" : "public")} {property.Type} {property.Name}\r\n" +
+                dalProperties.Add($"{(entity.IsInternal ? "internal" : "public")} {property.Type} {property.Name}" + LINE_PREFIX_2 +
                                     $"{{\r\n" +
-                                    $"    get {{ return _{property.Name}; }}\r\n" +
-                                    $"    set {{ _{property.Name} = value; }}\r\n" +
+                                    $"    get {{ return _{property.Name}; }}" + LINE_PREFIX_2 +
+                                    $"    set {{ _{property.Name} = value; }}" + LINE_PREFIX_2 +
                                     $"}}"
                 );
 
@@ -226,13 +249,7 @@ namespace DBWireup
                     if (param.IsPropertyBound)
                         type = entity.GetProperty(param.Name).Type;
 
-                    // Camel case parameter for method
-                    string argName;
-                    // HACK: ID is showing up as iD instead of id
-                    if (param.Name == "ID")
-                        argName = "id";
-                    else
-                        argName = char.ToLowerInvariant(param.Name[0]) + param.Name.Substring(1);
+                    string argName = CamelCaseString(param.Name);
                     parameters.Add($"{type} {argName}");
 
                     string val;
@@ -291,11 +308,13 @@ namespace DBWireup
 
             IList<string> columnList = new List<string>(); // Specific to Insert and Get
             IList<string> setValues = new List<string>(); // Specific to Update
+            IList<string> insertSqlInputParameterList = new List<string>(); // Specific to Insert
             IList<string> insertParamList = new List<string>(); // Specific to Insert
 
             StringBuilder result = new StringBuilder();
 
-            const string LINE_PREFIX = ",\r\n";
+            const string LINE_PREFIX_1 = ",\r\n";
+            const string LINE_PREFIX_2 = " AND \r\n";
 
             foreach (Property property in entity.Properties)
             {
@@ -303,6 +322,7 @@ namespace DBWireup
                 if (!property.IsPrimaryKey)
                 {
                     setValues.Add($"[{property.Name}] = {PARAM_PREFIX}{property.Name}");
+                    insertSqlInputParameterList.Add($"{PARAM_PREFIX}{property.Name}\t\t\t\t{property.SqlType}{GetSqlInputParameterSuffix(property, true)}");
                 }
                 insertParamList.Add($"{PARAM_PREFIX}{property.Name}");
             }
@@ -325,17 +345,7 @@ namespace DBWireup
                         if (property != null)
                         {
                             type = property.SqlType;
-                                
-                            if (!string.IsNullOrEmpty(property.DefaultValue))
-                            {
-                                // Hack for binary sql types
-                                if (property.Type == "string" && !(property.SqlType.Contains("binary") || property.SqlType.Contains("BINARY")))
-                                    extra += $" = \"{property.DefaultValue}\"";
-                                else
-                                    extra += $" = {property.DefaultValue}";
-                            }
-                            else if (property.IsNullable)
-                                extra += " = NULL";
+                            extra = GetSqlInputParameterSuffix(property);
 
                             paramList.Add($"[{property.Name}] = {PARAM_PREFIX + param.Name}");
                         }
@@ -350,27 +360,61 @@ namespace DBWireup
                 Template template = GetNewTemplate(SqlTemplates["ProcedureType_" + procedure.Type.ToString()], entity);
                 template.Add("TABLENAME", entity.TableName);
                 template.Add("PROCEDURE", procedure.GetNameSql(entity));
-                template.Add("SQLINPUTPARAMETERLIST", string.Join(LINE_PREFIX, sqlInputParameterList));
+
+                if (procedure.Type == ProcedureType.Insert || procedure.Type == ProcedureType.Update)
+                    template.Add("SQLINPUTPARAMETERLIST", string.Join(LINE_PREFIX_1, insertSqlInputParameterList));
+
                 var empty = true;
                 if (procedure.Type == ProcedureType.Insert)
                 {
-                    template.Add("SQLPARAMETERLIST", string.Join(LINE_PREFIX, insertParamList));
+                    template.Add("SQLPARAMETERLIST", string.Join(LINE_PREFIX_1, insertParamList));
                     empty = insertParamList.Count == 0;
                 }
                 else
                 {
-                    template.Add("SQLPARAMETERLIST", string.Join(LINE_PREFIX, paramList)); // Section where values in the table are set
+                    // HACK: I fucking hate this
+                    if (procedure.Type != ProcedureType.Update)
+                        template.Add("SQLINPUTPARAMETERLIST", string.Join(LINE_PREFIX_1, sqlInputParameterList));
+                    template.Add("SQLPARAMETERLIST", string.Join(LINE_PREFIX_2, paramList)); // Section where values in the table are set
                     empty = paramList.Count == 0;
                 }
                 template.Add("NOPARAMS", empty);
 
-                template.Add("COLUMNLIST", string.Join(LINE_PREFIX, columnList)); // Specific to Insert and Get
-                template.Add("SETVALUES", string.Join(LINE_PREFIX, setValues)); // Specific to Update
+                template.Add("COLUMNLIST", string.Join(LINE_PREFIX_1, columnList)); // Specific to Insert and Get
+                template.Add("SETVALUES", string.Join(LINE_PREFIX_1, setValues)); // Specific to Update
 
                 result.AppendLine(template.Render());
             }
 
             return result.ToString();
+        }
+
+        /// <summary>
+        /// Gets the suffix for an SQL input parameter defined in a set of procedure parameters.
+        /// </summary>
+        /// <param name="property">The property to base the parameter off of</param>
+        /// <param name="isInsert">Really really fucking stupid-ass hack</param>
+        /// <returns></returns>
+        internal static string GetSqlInputParameterSuffix(Property property, bool isInsert = false)
+        {
+            // HACK: https://stackoverflow.com/questions/470664/sql-function-as-default-parameter-value
+            if (isInsert && property.Type.ToLower() == "datetime"/* && property.IsNullable*/)
+                return " = NULL";
+
+            string extra = "";
+
+            if (!string.IsNullOrEmpty(property.DefaultValue))
+            {
+                // Hack for binary sql types
+                if (property.Type == "string" && !(property.SqlType.Contains("binary") || property.SqlType.Contains("BINARY")))
+                    extra += $" = \"{property.DefaultValue}\"";
+                else
+                    extra += $" = {property.DefaultValue}";
+            }
+            else if (property.IsNullable)
+                extra += " = NULL";
+
+            return extra;
         }
 
         internal static string FillModelTemplate(Entity entity, string repositoryNamespace)
@@ -428,6 +472,20 @@ namespace DBWireup
             template.Add("ENTITYSETTINGS", string.Join("\n\n", entitySettings.ToArray()));
 
             return template.Render();
+        }
+
+        /// <summary>
+        /// Camel case parameter for method
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        internal static string CamelCaseString(string str)
+        {
+            // HACK: ID is showing up as iD instead of id
+            if (str == "ID")
+                return "id";
+            else
+                return char.ToLowerInvariant(str[0]) + str.Substring(1);
         }
     }
 }

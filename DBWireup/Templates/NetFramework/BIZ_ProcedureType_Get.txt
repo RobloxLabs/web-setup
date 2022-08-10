@@ -1,0 +1,19 @@
+﻿~if(!(IDONLY))~
+~ACCESSIBILITY~ static ~BIZCLASSNAME~ ~PROCEDUREMETHOD~(~PARAMETERS~)
+{
+    return EntityHelper.GetEntityByLookup<~IDTYPE~, ~DALCLASSNAME~, ~BIZCLASSNAME~>(
+        EntityCacheInfo,
+        $"~COLLECTIONID~",
+        () => ~DALCLASSNAME~.~DALPROCEDUREMETHOD~(~DALPARAMS~)
+    );
+}
+~else~
+~ACCESSIBILITY~ static ~BIZCLASSNAME~ Get(~IDTYPE~ id)
+{
+    return EntityHelper.GetEntity<~IDTYPE~, ~DALCLASSNAME~, ~BIZCLASSNAME~>(
+        EntityCacheInfo,
+        id,
+        () => ~DALCLASSNAME~.Get(id)
+    );
+}
+~endif~

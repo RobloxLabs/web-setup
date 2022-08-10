@@ -1,0 +1,16 @@
+﻿~ACCESSIBILITY~ static ~IDTYPE~ ~PROCEDUREMETHOD~(~PARAMETERS~)
+{
+    return EntityHelper.GetEntityCount<int>(
+        EntityCacheInfo,
+        ~if(UNQUALIFIED)~
+        CacheManager.UnqualifiedNonExpiringCachePolicy,
+        ~else~
+        new CacheManager.CachePolicy(
+            CacheManager.CacheScopeFilter.Qualified,
+            $"~CACHELOOKUP~"
+        ),
+        ~endif~
+        $"~COLLECTIONID~",
+        () => ~DALCLASSNAME~.~DALPROCEDUREMETHOD~(~DALPARAMS~)
+    );
+}

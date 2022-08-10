@@ -2,11 +2,11 @@
 <Entity Name="RoleSet">
   <!-- The properties of the entity -->
   <Properties>
-	<Property Name="ID" Type="int" SqlType="INT" IsPrimaryKey="true" IsReadonly="true" />
+	<Property Name="ID" Type="int" SqlType="INT" IsPrimaryKey="true" IsReadOnly="true" />
     <Property Name="Name" Type="string" SqlType="VARCHAR(32)" />
     <Property Name="Rank" Type="int" SqlType="INT" />
-    <Property Name="Created" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadonly="true" />
-    <Property Name="Updated" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadonly="true" />
+    <Property Name="Created" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadOnly="true" />
+    <Property Name="Updated" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadOnly="true" />
   </Properties>
   
   <!-- The SQL procedures for the entity -->

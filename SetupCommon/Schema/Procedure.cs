@@ -76,24 +76,35 @@ namespace SetupCommon
         /// Gets the fully qualified name for the SQL procedure
         /// </summary>
         /// <param name="entity">The entity who owns the procedure</param>
+        /// <param name="hasPrefix">Whether or not the procedure name has the table name as a prefix</param>
         /// <returns></returns>
-        public string GetNameSql(Entity entity)
+        public string GetNameSql(Entity entity, bool hasPrefix = true)
         {
+            string result;
             switch (Type)
             {
                 case ProcedureType.GetPaged:
                     // Get{AccountRoleSet}IDs{ByAccountID}_Paged
-                    return $"Get{entity.Name}IDs{GetSuffix()}_Paged";
+                    result = $"Get{entity.Name}IDs{GetSuffix()}_Paged";
+                    break;
                 case ProcedureType.GetCount:
                     // GetTotalNumberOf{AssetHashScripts}{ByAssetHashID}
-                    return $"GetTotalNumberOf{entity.TableName}{GetSuffix()}";
+                    result = $"GetTotalNumberOf{entity.TableName}{GetSuffix()}";
+                    break;
                 case ProcedureType.MultiGet:
                     // Get{RecentItemLists}{ByID}s
-                    return $"Get{entity.TableName}{GetSuffix()}s"; // Only meant for one parameter
+                    result = $"Get{entity.TableName}{GetSuffix()}s"; // Only meant for one parameter
+                    break;
                 default:
                     // Get{AccountRoleSet}{ByID}
-                    return Type.ToString() + $"{entity.Name}{GetSuffix()}";
+                    result = Type.ToString() + $"{entity.Name}{GetSuffix()}";
+                    break;
             }
+
+            if (hasPrefix)
+                return entity.TableName + "_" + result;
+            else
+                return result;
         }
 
         /// <summary>
@@ -118,7 +129,24 @@ namespace SetupCommon
                 }
             }
 
-            return GetNameSql(entity).Replace("_", "");
+            return GetNameSql(entity, false).Replace("_", "");
+        }
+
+        /// <summary>
+        /// Gets the BIZ method name for the procedure
+        /// </summary>
+        /// <param name="entity">The entity who owns the procedure</param>
+        /// <returns></returns>
+        public string GetNameBiz(Entity entity)
+        {
+            switch (Type)
+            {
+                case ProcedureType.GetPaged:
+                    // Get{AccountRoleSet}s{ByAccountID}Paged
+                    return $"Get{entity.Name}s{GetSuffix()}Paged";
+                default:
+                    return GetNameDal(entity);
+            }
         }
 
         protected string GetSuffix()

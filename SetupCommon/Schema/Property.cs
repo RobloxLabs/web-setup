@@ -43,7 +43,7 @@ namespace SetupCommon
         /// Whether or not the value of the property is read-only.
         /// </summary>
         [XmlAttribute]
-        public bool IsReadonly { get; set; }
+        public bool IsReadOnly { get; set; }
 
         /// <summary>
         /// The default value of the property
@@ -55,7 +55,7 @@ namespace SetupCommon
         {
             IsPrimaryKey = false;
             IsNullable = false;
-            IsReadonly = false;
+            IsReadOnly = false;
         }
     }
 }

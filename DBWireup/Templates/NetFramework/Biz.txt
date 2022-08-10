@@ -7,20 +7,15 @@ using Roblox.Data.Interfaces;
 
 namespace ~NAMESPACE~
 {
-    ~ACCESSIBILITY~ class ~BIZCLASSNAME~ : IRobloxEntity<~IDTYPE~, ~CLASSNAME~> ~BIZREMOTECACHEABLE~
+    ~ACCESSIBILITY~ class ~BIZCLASSNAME~ : IRobloxEntity<~IDTYPE~, ~DALCLASSNAME~> ~BIZREMOTECACHEABLE~
     {
-        private ~CLASSNAME~ _EntityDAL;
-
-        public ~IDTYPE~ ID
-        { 
-            get { return _EntityDAL.ID; }
-        }
+        private ~DALCLASSNAME~ _EntityDAL;
 
         ~BIZPROPERTIES~
 
         public ~BIZCLASSNAME~()
         {
-            _EntityDAL = new ~CLASSNAME~();
+            _EntityDAL = new ~DALCLASSNAME~();
         }
         
 		~ACCESSIBILITY~ void Delete()
@@ -56,18 +51,10 @@ namespace ~NAMESPACE~
 
             return entity;
         }
-        ~ACCESSIBILITY~ static ~BIZCLASSNAME~ Get(~IDTYPE~ id)
-        {
-            return EntityHelper.GetEntity<~IDTYPE~, ~CLASSNAME~, ~BIZCLASSNAME~>(
-                EntityCacheInfo,
-                id,
-                () => ~CLASSNAME~.Get(id)
-            );
-        }
 
         ~PARAMFUNCTIONS~
 
-        public void Construct(~CLASSNAME~ dal)
+        public void Construct(~DALCLASSNAME~ dal)
         {
             _EntityDAL = dal;
         }
