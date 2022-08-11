@@ -1,6 +1,6 @@
 ﻿~ACCESSIBILITY~ static ~IDTYPE~ ~PROCEDUREMETHOD~(~PARAMETERS~)
 {
-    return EntityHelper.GetEntityCount<int>(
+    return EntityHelper.GetEntityCount<~IDTYPE~>(
         EntityCacheInfo,
         ~if(UNQUALIFIED)~
         CacheManager.UnqualifiedNonExpiringCachePolicy,

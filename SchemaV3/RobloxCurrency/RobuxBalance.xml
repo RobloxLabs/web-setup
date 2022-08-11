@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<Entity Name="RobuxBalance" Namespace="Roblox.Economy.Common">
+  <Properties>
+	<Property Name="ID" Type="int" SqlType="INT" IsPrimaryKey="true" IsReadOnly="true" />
+    <Property Name="UserID" Type="int" SqlType="INT" />
+    <Property Name="Value" Type="long" SqlType="BIGINT" />
+    <Property Name="Created" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadOnly="true" />
+    <Property Name="Updated" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadOnly="true" />
+  </Properties>
+  <Procedures>
+	<!-- Deletes the entity with the given ID -->
+	<Procedure Type="Delete">
+		<Parameters>
+			<Parameter Name="ID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Gets the entity with the given ID -->
+	<Procedure Type="Get">
+		<Parameters>
+			<Parameter Name="ID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Inserts the entity into the table -->
+	<Procedure Type="Insert" />
+	
+	<!-- Updates the entity with the given ID -->
+	<Procedure Type="Update">
+		<Parameters>
+			<Parameter Name="ID" />
+		</Parameters>
+	</Procedure>
+	
+  </Procedures>
+</Entity>

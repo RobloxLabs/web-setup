@@ -72,6 +72,8 @@ namespace DBWireup
                 template.Add("ACCESSIBILITY", entity.IsInternal ? "internal" : "public");
                 template.Add("IDTYPE", entity.GetIDProperty().Type);
                 template.Add("SQLIDTYPE", entity.GetIDProperty().SqlType); // Specific to Insert
+                template.Add("CURRENTDATE", DateTime.Now.ToShortDateString());
+                template.Add("CURRENTTIME", DateTime.Now.ToLongTimeString());
             }
 
             return template;
@@ -216,6 +218,7 @@ namespace DBWireup
             IList<string> dalProperties = new List<string>();
             IList<string> readerParameters = new List<string>();
             IList<string> paramFunctions = new List<string>();
+            IList<string> insertUpdateQueryParameters = new List<string>();
             string connectionStringPropName = $"dbConnectionString_{entity.Name}DAL"; // Config.ConnectionStringPropertyName
             const string LINE_PREFIX_1 = ",\r\n";
             const string LINE_PREFIX_2 = "\r\n";
@@ -234,6 +237,8 @@ namespace DBWireup
                 );
 
                 readerParameters.Add($"dal.{property.Name} = ({property.Type})reader[\"{property.Name}\"];");
+                if (!property.IsPrimaryKey)
+                    insertUpdateQueryParameters.Add($"new SqlParameter(\"{PARAM_PREFIX}{property.Name}\", _{property.Name})");
             }
 
             // DAL Procedure templates //
@@ -267,7 +272,10 @@ namespace DBWireup
                 Template procedureT = GetNewTemplate(NetFrameworkTemplates["DAL_ProcedureType_" + procedure.Type.ToString()], entity);
                 procedureT.Add("PARAMETERS", string.Join(", ", parameters));
                 procedureT.Add("PARAMETERVALIDATION", string.Join(LINE_PREFIX_2, parameterValidation));
-                procedureT.Add("QUERYPARAMETERS", string.Join(LINE_PREFIX_1, queryParameters));
+                if (procedure.Type == ProcedureType.Insert || procedure.Type == ProcedureType.Update)
+                    procedureT.Add("QUERYPARAMETERS", string.Join(LINE_PREFIX_1, insertUpdateQueryParameters));
+                else
+                    procedureT.Add("QUERYPARAMETERS", string.Join(LINE_PREFIX_1, queryParameters));
                 procedureT.Add("CONNECTIONSTRING", connectionStringPropName);
                 procedureT.Add("PROCEDURE", procedure.GetNameSql(entity));
                 procedureT.Add("PROCEDUREMETHOD", procedure.GetNameDal(entity));
@@ -306,7 +314,8 @@ namespace DBWireup
             IList<string> sqlInputParameterList; // Procedure params
             IList<string> paramList; // Section where values in the table are matched up to the parameters
 
-            IList<string> columnList = new List<string>(); // Specific to Insert and Get
+            IList<string> columnList = new List<string>(); // Specific to Get
+            IList<string> insertColumnList = new List<string>(); // Specific to Insert
             IList<string> setValues = new List<string>(); // Specific to Update
             IList<string> insertSqlInputParameterList = new List<string>(); // Specific to Insert
             IList<string> insertParamList = new List<string>(); // Specific to Insert
@@ -321,10 +330,11 @@ namespace DBWireup
                 columnList.Add($"[{property.Name}]");
                 if (!property.IsPrimaryKey)
                 {
+                    insertColumnList.Add($"[{property.Name}]");
                     setValues.Add($"[{property.Name}] = {PARAM_PREFIX}{property.Name}");
                     insertSqlInputParameterList.Add($"{PARAM_PREFIX}{property.Name}\t\t\t\t{property.SqlType}{GetSqlInputParameterSuffix(property, true)}");
+                    insertParamList.Add($"{PARAM_PREFIX}{property.Name}");
                 }
-                insertParamList.Add($"{PARAM_PREFIX}{property.Name}");
             }
 
             foreach (var procedure in entity.Procedures)
@@ -369,6 +379,7 @@ namespace DBWireup
                 {
                     template.Add("SQLPARAMETERLIST", string.Join(LINE_PREFIX_1, insertParamList));
                     empty = insertParamList.Count == 0;
+                    template.Add("COLUMNLIST", string.Join(LINE_PREFIX_1, insertColumnList)); // Specific to Insert and Get
                 }
                 else
                 {
@@ -377,10 +388,10 @@ namespace DBWireup
                         template.Add("SQLINPUTPARAMETERLIST", string.Join(LINE_PREFIX_1, sqlInputParameterList));
                     template.Add("SQLPARAMETERLIST", string.Join(LINE_PREFIX_2, paramList)); // Section where values in the table are set
                     empty = paramList.Count == 0;
+
+                    template.Add("COLUMNLIST", string.Join(LINE_PREFIX_1, columnList)); // Specific to Insert and Get
                 }
                 template.Add("NOPARAMS", empty);
-
-                template.Add("COLUMNLIST", string.Join(LINE_PREFIX_1, columnList)); // Specific to Insert and Get
                 template.Add("SETVALUES", string.Join(LINE_PREFIX_1, setValues)); // Specific to Update
 
                 result.AppendLine(template.Render());

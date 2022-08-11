@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<Entity Name="AccountStatus" TableName="AccountStatuses">
+  <Properties>
+  	<Property Name="ID" Type="byte" SqlType="TINYINT" IsPrimaryKey="true" IsReadOnly="true" />
+	<Property Name="Value" Type="string" SqlType="nvarchar(50)" />
+	<Property Name="Description" Type="string" SqlType="nvarchar(1000)" />
+	<Property Name="Abbreviation" Type="string" SqlType="nvarchar(10)" />
+    <Property Name="Created" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadOnly="true" />
+    <Property Name="Updated" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadOnly="true" />
+  </Properties>
+  <Procedures>
+	<!-- Deletes the entity with the given ID -->
+	<Procedure Type="Delete">
+		<Parameters>
+			<Parameter Name="ID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Gets the entity with the given ID -->
+	<Procedure Type="Get">
+		<Parameters>
+			<Parameter Name="ID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Inserts the entity into the table -->
+	<Procedure Type="Insert" />
+	
+	<!-- Updates the entity with the given ID -->
+	<Procedure Type="Update">
+		<Parameters>
+			<Parameter Name="ID" />
+		</Parameters>
+	</Procedure>
+	
+  </Procedures>
+</Entity>

@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<Entity Name="Asset">
+  <!-- The properties of the entity. Let's hope we get this right!! -->
+  <Properties>
+	<Property Name="ID" Type="int" SqlType="INT" IsPrimaryKey="true" IsReadOnly="true" />
+    <Property Name="Name" Type="string" SqlType="NVARCHAR(50)" />
+    <Property Name="Description" Type="string" SqlType="NVARCHAR(1000)" />
+    <Property Name="AssetTypeID" Type="int" SqlType="INT" />
+	<Property Name="CurrentVersionID" Type="long" SqlType="BIGINT" />
+    <Property Name="CreatorID" Type="int" SqlType="INT" />
+	<!-- Deprecated -->
+    <!--Property Name="ToolboxID" Type="int" SqlType="INT" /-->
+	<!-- Not included directly in DAL -->
+    <!--Property Name="AssetGenres" Type="long" SqlType="BIGINT" />
+    <Property Name="AssetCategories" Type="long" SqlType="BIGINT" /-->
+    <Property Name="Created" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadOnly="true" />
+    <Property Name="Updated" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadOnly="true" />
+  </Properties>
+  
+  <!-- The SQL procedures for the entity -->
+  <Procedures>
+	<!-- Deletes the entity with the given ID -->
+	<Procedure Type="Delete">
+		<Parameters>
+			<Parameter Name="ID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Gets the entity with the given ID -->
+	<Procedure Type="Get">
+		<Parameters>
+			<Parameter Name="ID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Inserts the entity into the table -->
+	<Procedure Type="Insert" />
+	
+	<!-- Updates the entity with the given ID -->
+	<Procedure Type="Update">
+		<Parameters>
+			<Parameter Name="ID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Gets the total number of Assets with the given CreatorID -->
+	<Procedure Type="GetCount">
+		<Parameters>
+			<Parameter Name="CreatorID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Gets the total number of Assets with the given ToolboxID -->
+	<!--Procedure Type="GetCount">
+		<Parameters>
+			<Parameter Name="ToolboxID" />
+		</Parameters>
+	</Procedure-->
+	
+  </Procedures>
+</Entity>

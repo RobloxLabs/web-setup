@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<Entity Name="Invitation" >
+  <Properties>
+  	<Property Name="ID" Type="int" SqlType="INT" IsPrimaryKey="true" IsReadOnly="true" />
+	<Property Name="InviterID" Type="int" SqlType="INT" />
+	<Property Name="InviteeID" Type="int" SqlType="INT" />
+	<Property Name="InvitationTypeID" Type="int" SqlType="INT" />
+	<Property Name="InvitationMessageID" Type="int" SqlType="INT" />
+	<Property Name="ResponseTypeID" Type="int?" SqlType="INT" IsNullable="true" />
+	<Property Name="ResponseMessageID" Type="int?" SqlType="INT" IsNullable="true" />
+    <Property Name="Created" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadOnly="true" />
+    <Property Name="Updated" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadOnly="true" />
+  </Properties>
+  <Procedures>
+	<!-- Deletes the entity with the given ID -->
+	<Procedure Type="Delete">
+		<Parameters>
+			<Parameter Name="ID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Gets the entity with the given ID -->
+	<Procedure Type="Get">
+		<Parameters>
+			<Parameter Name="ID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Inserts the entity into the table -->
+	<Procedure Type="Insert" />
+	
+	<!-- Updates the entity with the given ID -->
+	<Procedure Type="Update">
+		<Parameters>
+			<Parameter Name="ID" />
+		</Parameters>
+	</Procedure>
+	
+  </Procedures>
+</Entity>

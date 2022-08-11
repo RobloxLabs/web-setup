@@ -5,9 +5,17 @@ using System.Data.SqlClient;
 using Roblox.Common;
 using Roblox.Common.Persistence;
 using Roblox.Mssql;
+using Roblox.Entities.Mssql;
 
 namespace ~NAMESPACE~
 {
+    /// <summary>
+    /// Represents the Data Access Layer for the <see cref="~BIZCLASSNAME~"/> entity.
+    /// </summary>
+    /// <remarks>
+    /// Generated on ~CURRENTDATE~ at ~CURRENTTIME~.
+    /// </remarks>
+    [Serializable]
     ~ACCESSIBILITY~ class ~DALCLASSNAME~
     {
         ~DALFIELDS~

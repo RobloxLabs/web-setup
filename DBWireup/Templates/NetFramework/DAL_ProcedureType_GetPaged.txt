@@ -11,6 +11,6 @@
 
     using (var database = new GuardedDatabase(~CONNECTIONSTRING~))
     {
-        return database.GetIDCollection<~IDTYPE~>("[dbo].[~PROCEDURE~]", BuildDAL~if(!(NOPARAMS))~, queryParameters: queryParameters.ToArray()~endif~);
+        return database.GetIDCollection<~IDTYPE~>("[dbo].[~PROCEDURE~]"~if(!(NOPARAMS))~, queryParameters: queryParameters.ToArray()~endif~);
     }
 }

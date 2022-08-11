@@ -7,6 +7,13 @@ using Roblox.Data.Interfaces;
 
 namespace ~NAMESPACE~
 {
+    /// <summary>
+    /// The ~BIZCLASSNAME~ entity.
+    /// </summary>
+    /// <remarks>
+    /// Generated on ~CURRENTDATE~ at ~CURRENTTIME~.
+    /// </remarks>
+    [Serializable]
     ~ACCESSIBILITY~ class ~BIZCLASSNAME~ : IRobloxEntity<~IDTYPE~, ~DALCLASSNAME~> ~BIZREMOTECACHEABLE~
     {
         private ~DALCLASSNAME~ _EntityDAL;

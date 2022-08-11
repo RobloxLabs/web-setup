@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!-- Based off ModerationAction from the legacy moderation system -->
+<Entity Name="Punishment" Namespace="Roblox.Moderation">
+  <Properties>
+	<Property Name="ID" Type="long" SqlType="BIGINT" IsPrimaryKey="true" IsReadOnly="true" />
+    <Property Name="UserID" Type="int" SqlType="INT" />
+	<Property Name="PunishmentTypeID" Type="byte" SqlType="TINYINT" />
+	<Property Name="PunishmentReasonTypeID" Type="byte" SqlType="TINYINT" />
+	<Property Name="AbuseUtteranceID" Type="long?" SqlType="BIGINT" IsNullable="true" />
+    <Property Name="ModeratorID" Type="int" SqlType="INT" />
+    <Property Name="Expiration" Type="DateTime?" SqlType="DATETIME" IsNullable="true" />
+    <Property Name="Comment" Type="string" SqlType="NVarChar(1024)" />
+    <Property Name="ModeratorMessage" Type="string" SqlType="NVarChar(256)" />
+    <Property Name="Created" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadOnly="true" />
+    <Property Name="Updated" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadOnly="true" />
+  </Properties>
+  <Procedures>
+	<!-- Deletes the entity with the given ID -->
+	<Procedure Type="Delete">
+		<Parameters>
+			<Parameter Name="ID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Gets the entity with the given ID -->
+	<Procedure Type="Get">
+		<Parameters>
+			<Parameter Name="ID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Gets the Punishment IDs for the given User ID -->
+	<Procedure Type="GetPaged">
+		<Parameters>
+			<Parameter Name="UserID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Gets the total number of Punishments for the given User ID -->
+	<Procedure Type="GetCount">
+		<Parameters>
+			<Parameter Name="UserID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Inserts the entity into the table -->
+	<Procedure Type="Insert" />
+	
+	<!-- Updates the entity with the given ID -->
+	<Procedure Type="Update">
+		<Parameters>
+			<Parameter Name="ID" />
+		</Parameters>
+	</Procedure>
+	
+  </Procedures>
+</Entity>

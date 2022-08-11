@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<Entity Name="User">
+  <Properties>
+  	<Property Name="ID" Type="int" SqlType="INT" IsPrimaryKey="true" IsReadOnly="true" />
+    <Property Name="AccountID" Type="int" SqlType="INT" />
+    <Property Name="AgeBracket" Type="AgeBracket" SqlType="TINYINT" />
+    <Property Name="UseSuperSafeConversationMode" Type="bool" SqlType="BIT" />
+    <Property Name="UseSuperSafePrivacyMode" Type="bool" SqlType="BIT" />
+    <Property Name="ParentID" Type="int?" SqlType="INT" IsNullable="true" />
+    <Property Name="AgeBracketIsLocked" Type="bool" SqlType="BIT" />
+    <Property Name="ConversationSafetyModeIsLocked" Type="bool" SqlType="BIT" />
+    <Property Name="PrivacySafetyModeIsLocked" Type="bool" SqlType="BIT" />
+    <Property Name="AcquisitionTime" Type="DateTime?" SqlType="DateTime" IsNullable="true" />
+    <Property Name="AcquisitionMedium" Type="string" SqlType="VARCHAR(20)" />
+    <Property Name="AcquisitionSource" Type="string" SqlType="VARCHAR(20)" />
+    <Property Name="AcquisitionCampaign" Type="string" SqlType="VARCHAR(20)" />
+    <Property Name="AcquisitionReferrer" Type="string" SqlType="VARCHAR(20)" />
+    <Property Name="AssociatedEntityID" Type="int?" SqlType="INT" IsNullable="true" />
+    <Property Name="AssociatedEntityType" Type="CreatorType" SqlType="TINYINT" />
+    <Property Name="Created" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadOnly="true" />
+    <Property Name="Updated" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadOnly="true" />
+  </Properties>
+  <Procedures>
+	<!-- Deletes the entity with the given ID -->
+	<Procedure Type="Delete">
+		<Parameters>
+			<Parameter Name="ID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Gets the entity with the given ID -->
+	<Procedure Type="Get">
+		<Parameters>
+			<Parameter Name="ID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Inserts the entity into the table -->
+	<Procedure Type="Insert" />
+	
+	<!-- Updates the entity with the given ID -->
+	<Procedure Type="Update">
+		<Parameters>
+			<Parameter Name="ID" />
+		</Parameters>
+	</Procedure>
+	
+  </Procedures>
+</Entity>
