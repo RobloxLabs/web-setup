@@ -11,6 +11,8 @@
     <Property Name="Expiration" Type="DateTime?" SqlType="DATETIME" IsNullable="true" />
     <Property Name="Comment" Type="string" SqlType="NVarChar(1024)" />
     <Property Name="ModeratorMessage" Type="string" SqlType="NVarChar(256)" />
+    <Property Name="Acknowledged" Type="bool" SqlType="BIT" Default="0" />
+    <Property Name="AcknowledgedDate" Type="DateTime?" SqlType="DateTime" IsNullable="true" />
     <Property Name="Created" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadOnly="true" />
     <Property Name="Updated" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadOnly="true" />
   </Properties>

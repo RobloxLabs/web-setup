@@ -4,7 +4,6 @@
 
     var queryParameters = new List<SqlParameter>
     {
-        new SqlParameter("@ID", _ID),
 		~QUERYPARAMETERS~
     };
 

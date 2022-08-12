@@ -74,6 +74,8 @@ namespace DBWireup
                 template.Add("SQLIDTYPE", entity.GetIDProperty().SqlType); // Specific to Insert
                 template.Add("CURRENTDATE", DateTime.Now.ToShortDateString());
                 template.Add("CURRENTTIME", DateTime.Now.ToLongTimeString());
+                string type = entity.GetIDProperty().Type.ToLower();
+                template.Add("COUNTTYPE", type == "byte" ? "int" : type);
             }
 
             return template;
@@ -236,7 +238,10 @@ namespace DBWireup
                                     $"}}"
                 );
 
-                readerParameters.Add($"dal.{property.Name} = ({property.Type})reader[\"{property.Name}\"];");
+                if (property.IsNullable)
+                    readerParameters.Add($"dal.{property.Name} = (reader[\"{property.Name}\"] != DBNull.Value ? ({property.Type})reader[\"{property.Name}\"] : null);");
+                else
+                    readerParameters.Add($"dal.{property.Name} = ({property.Type})reader[\"{property.Name}\"];");
                 if (!property.IsPrimaryKey)
                     insertUpdateQueryParameters.Add($"new SqlParameter(\"{PARAM_PREFIX}{property.Name}\", _{property.Name})");
             }
@@ -393,6 +398,7 @@ namespace DBWireup
                 }
                 template.Add("NOPARAMS", empty);
                 template.Add("SETVALUES", string.Join(LINE_PREFIX_1, setValues)); // Specific to Update
+                template.Add("COUNTBIG", entity.GetIDProperty().SqlType == "BIGINT");
 
                 result.AppendLine(template.Render());
             }

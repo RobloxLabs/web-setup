@@ -11,6 +11,6 @@
 
     using (var database = new GuardedDatabase(~CONNECTIONSTRING~))
     {
-        return database.GetCount<~IDTYPE~>("[dbo].[~PROCEDURE~]"~if(!(NOPARAMS))~, queryParameters: queryParameters.ToArray()~endif~);
+        return database.GetCount<~COUNTTYPE~>("[dbo].[~PROCEDURE~]"~if(!(NOPARAMS))~, queryParameters: queryParameters.ToArray()~endif~);
     }
 }

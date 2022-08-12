@@ -19,7 +19,7 @@ AS
 SET NOCOUNT ON
 
 SELECT
-    COUNT(*)
+    ~if(COUNTBIG)~COUNT_BIG(*)~else~COUNT(*)~endif~
 FROM
     [dbo].[~TABLENAME~]
 ~if(!(NOPARAMS))~WHERE
