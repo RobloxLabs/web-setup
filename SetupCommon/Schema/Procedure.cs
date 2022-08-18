@@ -155,7 +155,7 @@ namespace SetupCommon
             IList<string> paramNames = new List<string>();
 
             // Just InsertSale, no InsertSaleByAllColumns
-            if (Parameters.Count != 0 ||
+            if ((Parameters != null && Parameters.Count != 0) ||
                 Type != ProcedureType.Insert)
             {
                 foreach (var param in Parameters)

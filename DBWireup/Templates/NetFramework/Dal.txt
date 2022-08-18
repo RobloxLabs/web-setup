@@ -6,6 +6,7 @@ using Roblox.Common;
 using Roblox.Common.Persistence;
 using Roblox.Mssql;
 using Roblox.Entities.Mssql;
+using Roblox.DataV2.Core;
 
 namespace ~NAMESPACE~
 {

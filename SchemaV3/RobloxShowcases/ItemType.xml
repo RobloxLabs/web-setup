@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<Entity Name="ItemType" Namespace="Roblox.Showcases.Entities">
+  <!-- The properties of the entity -->
+  <Properties>
+	<Property Name="ID" Type="byte" SqlType="TINYINT" IsPrimaryKey="true" IsReadOnly="true" />
+    <Property Name="Value" Type="string" SqlType="VARCHAR(16)" />
+    <Property Name="Created" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadOnly="true" />
+    <Property Name="Updated" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadOnly="true" />
+  </Properties>
+  
+  <!-- The SQL procedures for the entity -->
+  <Procedures>
+	<!-- Deletes the entity with the given ID -->
+	<Procedure Type="Delete">
+		<Parameters>
+			<Parameter Name="ID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Gets the entity with the given ID -->
+	<Procedure Type="Get">
+		<Parameters>
+			<Parameter Name="ID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Gets the ItemType with the given Value -->
+	<Procedure Type="Get">
+		<Parameters>
+			<Parameter Name="Value" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Inserts the entity into the table -->
+	<Procedure Type="Insert" />
+	
+	<!-- Updates the entity with the given ID -->
+	<Procedure Type="Update">
+		<Parameters>
+			<Parameter Name="ID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Gets or Creates the ItemType with the given Value -->
+	<Procedure Type="GetOrCreate">
+		<Parameters>
+			<Parameter Name="Value" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Gets ItemTypes by their given IDs -->
+	<!--Procedure Type="MultiGet">
+		<Parameters>
+			<Parameter Name="ID" />
+		</Parameters>
+	</Procedure-->
+	
+  </Procedures>
+</Entity>

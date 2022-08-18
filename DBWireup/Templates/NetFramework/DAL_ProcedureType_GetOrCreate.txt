@@ -1,0 +1,14 @@
+﻿~ACCESSIBILITY~ static GetOrCreateResult<~DALCLASSNAME~> ~PROCEDUREMETHOD~(~PARAMETERS~)
+{
+    ~PARAMETERVALIDATION~
+
+    var queryParameters = new List<SqlParameter>
+    {
+        ~QUERYPARAMETERS~
+    };
+
+    using (var database = new GuardedDatabase(~CONNECTIONSTRING~))
+    {
+        return database.GetOrCreate("[dbo].[~PROCEDURE~]", BuildDAL, queryParameters: queryParameters.ToArray());
+    }
+}

@@ -1,0 +1,14 @@
+﻿private static ~BIZCLASSNAME~ Do~PROCEDUREMETHOD~(~PARAMETERS~)
+{
+    return EntityHelper.DoGetOrCreate<~IDTYPE~, ~DALCLASSNAME~, ~BIZCLASSNAME~>(
+        () => ~DALCLASSNAME~.~DALPROCEDUREMETHOD~(~DALPARAMS~)
+    );
+}
+~ACCESSIBILITY~ static ~BIZCLASSNAME~ ~PROCEDUREMETHOD~(~PARAMETERS~)
+{
+    return EntityHelper.GetOrCreateEntity<~IDTYPE~, ~BIZCLASSNAME~>(
+        EntityCacheInfo,
+        $"~COLLECTIONID~",
+        () => { return Do~PROCEDUREMETHOD~(~DALPARAMS~); }
+    );
+}

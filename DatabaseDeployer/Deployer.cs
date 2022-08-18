@@ -42,10 +42,13 @@ namespace DatabaseDeployer
                 foreach (Database database in DatabaseList)
                 {
                     string databaseSql = TemplateHelper.FillDatabaseTemplate(database);
+                    string databaseConfigSql = TemplateHelper.FillDatabaseConfigTemplate(database);
                     string tableSql = TemplateHelper.FillTablesTemplate(database);
 
                     SqlCommand databaseCommand = new SqlCommand(databaseSql, connection);
                     databaseCommand.ExecuteNonQuery();
+                    SqlCommand databaseConfigCommand = new SqlCommand(databaseConfigSql, connection);
+                    databaseConfigCommand.ExecuteNonQuery();
 
                     // If no tables exist for a database, tableSql is empty.
                     if (!string.IsNullOrEmpty(tableSql))

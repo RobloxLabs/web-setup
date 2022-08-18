@@ -152,6 +152,7 @@ namespace DBWireup
             }
 
             // BIZ Procedure templates //
+            // TODO: Separate out into method (MODULATE!!!)
             foreach (Procedure procedure in entity.Procedures)
             {
                 if ((int)procedure.Type > (int)ProcedureType.Update)
@@ -318,6 +319,9 @@ namespace DBWireup
         {
             IList<string> sqlInputParameterList; // Procedure params
             IList<string> paramList; // Section where values in the table are matched up to the parameters
+            IList<string> execParams; // Specific to GetOrCreate procedure
+            IList<string> procColumnList; // Specific to GetOrCreate procedure
+            IList<string> procValues; // Specific to GetOrCreate procedure
 
             IList<string> columnList = new List<string>(); // Specific to Get
             IList<string> insertColumnList = new List<string>(); // Specific to Insert
@@ -346,6 +350,9 @@ namespace DBWireup
             {
                 sqlInputParameterList = new List<string>();
                 paramList = new List<string>();
+                execParams = new List<string>();
+                procColumnList = new List<string>();
+                procValues = new List<string>();
 
                 foreach (var param in procedure.Parameters)
                 {
@@ -362,7 +369,10 @@ namespace DBWireup
                             type = property.SqlType;
                             extra = GetSqlInputParameterSuffix(property);
 
+                            procColumnList.Add($"[{property.Name}]");
+                            procValues.Add(PARAM_PREFIX + property.Name);
                             paramList.Add($"[{property.Name}] = {PARAM_PREFIX + param.Name}");
+                            execParams.Add($"{PARAM_PREFIX + property.Name} = {PARAM_PREFIX + param.Name}");
                         }
                     }
                     else
@@ -398,6 +408,32 @@ namespace DBWireup
                 }
                 template.Add("NOPARAMS", empty);
                 template.Add("SETVALUES", string.Join(LINE_PREFIX_1, setValues)); // Specific to Update
+
+                // HORRIBLY HACKY and ALL GETORCREATE SPECIFIC.
+                // FUCK
+                if (procedure.Type == ProcedureType.GetOrCreate)
+                {
+                    // TODO: Hacky
+                    template.Add("EXECPARAMS", string.Join(LINE_PREFIX_1, execParams)); // Specific to GetOrCreate
+                    // Insert
+                    var insertProc = new Procedure
+                    {
+                        Type = ProcedureType.Insert
+                    };
+                    template.Add("INSERTPROCEDURE", insertProc.GetNameSql(entity));
+
+                    // Get
+                    var getProc = new Procedure
+                    {
+                        Type = ProcedureType.Get,
+                        Parameters = procedure.Parameters
+                    };
+                    template.Add("GETPROCEDURE", getProc.GetNameSql(entity));
+
+                    template.Add("SQLINSERTPARAMETERLIST", string.Join(LINE_PREFIX_1, procValues)); // Specific to GetOrCreate
+                    template.Add("INSERTCOLUMNLIST", string.Join(LINE_PREFIX_1, procColumnList)); // Specific to GetOrCreate
+                }
+
                 template.Add("COUNTBIG", entity.GetIDProperty().SqlType == "BIGINT");
 
                 result.AppendLine(template.Render());

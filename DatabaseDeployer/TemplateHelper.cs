@@ -54,6 +54,13 @@ namespace DatabaseDeployer
             return template.Render();
         }
 
+        internal static string FillDatabaseConfigTemplate(Database database)
+        {
+            Template template = GetNewTemplate(Templates["DatabaseConfig"], database);
+
+            return template.Render();
+        }
+
         internal static string FillTablesTemplate(Database database)
         {
             StringBuilder tables = new StringBuilder();

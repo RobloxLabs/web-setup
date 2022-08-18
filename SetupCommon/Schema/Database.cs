@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Xml;
 using System.Xml.Serialization;
+using System.Diagnostics;
 
 namespace SetupCommon
 {
+    [DebuggerDisplay("{Name} Database")]
     [Serializable]
     public class Database
     {
