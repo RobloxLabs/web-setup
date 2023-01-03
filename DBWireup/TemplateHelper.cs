@@ -200,7 +200,7 @@ namespace DBWireup
 
             // BIZ Template //
             Template template = GetNewTemplate(NetFrameworkTemplates["BIZ"], entity);
-            template.Add("BIZREMOTECACHEABLE", ""); // Maybe should do something with this
+            //template.Add("BIZREMOTECACHEABLE", $", ICacheableObject<{entity.GetIDProperty().Type}>"); // Maybe should do something with this
             template.Add("BIZREMOTECACHEABLEREGION", ""); // This too
             template.Add("BIZPROPERTIES", bizProperties);
             template.Add("CREATENEWPARAMS", string.Join(", ", createNewParams.ToArray()));

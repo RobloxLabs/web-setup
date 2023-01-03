@@ -26,16 +26,32 @@ BEGIN
     SET @Offset = 0;
 END
 
-SELECT
-    [ID]
-FROM
-    [dbo].[~TABLENAME~]
-~if(!(NOPARAMS))~WHERE
-(
-    ~SQLPARAMETERLIST~
-)~endif~
-ORDER BY [ID]
-OFFSET @Offset ROWS FETCH NEXT @MaximumRows ROWS ONLY
+IF (@MaximumRows < 0)
+BEGIN
+    SELECT
+        [ID]
+    FROM
+        [dbo].[~TABLENAME~]
+    ~if(!(NOPARAMS))~WHERE
+    (
+        ~SQLPARAMETERLIST~
+    )~endif~
+    ORDER BY [ID]
+    OFFSET @Offset ROWS
+END
+ELSE
+BEGIN
+    SELECT
+        [ID]
+    FROM
+        [dbo].[~TABLENAME~]
+    ~if(!(NOPARAMS))~WHERE
+    (
+        ~SQLPARAMETERLIST~
+    )~endif~
+    ORDER BY [ID]
+    OFFSET @Offset ROWS FETCH NEXT @MaximumRows ROWS ONLY
+END
 
 SET NOCOUNT OFF
 

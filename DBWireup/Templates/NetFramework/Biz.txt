@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Roblox;
-using Roblox.Caching;
 using Roblox.Common;
+using Roblox.Caching;
+using Roblox.Caching.Interfaces;
 using Roblox.Data.Interfaces;
 
 namespace ~NAMESPACE~
@@ -14,7 +15,7 @@ namespace ~NAMESPACE~
     /// Generated on ~CURRENTDATE~ at ~CURRENTTIME~.
     /// </remarks>
     [Serializable]
-    ~ACCESSIBILITY~ class ~BIZCLASSNAME~ : IRobloxEntity<~IDTYPE~, ~DALCLASSNAME~> ~BIZREMOTECACHEABLE~
+    ~ACCESSIBILITY~ class ~BIZCLASSNAME~ : IRobloxEntity<~IDTYPE~, ~DALCLASSNAME~>, ICacheableObject<~IDTYPE~>
     {
         private ~DALCLASSNAME~ _EntityDAL;
 
@@ -61,11 +62,17 @@ namespace ~NAMESPACE~
 
         ~PARAMFUNCTIONS~
 
+        #region IRobloxEntity Members
+
         public void Construct(~DALCLASSNAME~ dal)
         {
             _EntityDAL = dal;
         }
+		
+        #endregion IRobloxEntity Members
 
+        #region ICacheableObject Members
+		
         public CacheInfo CacheInfo
         {
             get { return EntityCacheInfo; }
@@ -87,6 +94,8 @@ namespace ~NAMESPACE~
         ~STATETOKENCOLLECTION~
             yield break;
         }
+		
+        #endregion ICacheableObject Members
 
         ~BIZREMOTECACHEABLEREGION~
     }
