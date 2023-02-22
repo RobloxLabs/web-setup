@@ -106,6 +106,11 @@ namespace DBWireup
                                     TemplateHelper.FillBizTemplate(entity)
                                 );
                             }
+                            catch (ExecutionFailureException ex)
+                            {
+                                var message = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+                                Console.WriteLine($"An error occured during SQL execution while wiring up {entity.Name}: \n{message}\n");
+                            }
                             catch (Exception ex)
                             {
                                 Console.WriteLine($"Failed to wireup {entity.Name}! Reason: {ex.Message}");

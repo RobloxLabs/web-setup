@@ -1,10 +1,12 @@
 <?xml version="1.0"?>
-<Entity Name="PunishmentReasonType" Namespace="Roblox.Moderation">
+<Entity Name="AbuseType" Namespace="Roblox.Moderation">
   <Properties>
   	<Property Name="ID" Type="byte" SqlType="TINYINT" IsPrimaryKey="true" IsReadOnly="true" />
     <Property Name="Value" Type="string" SqlType="varchar(32)" />
-    <Property Name="Comment" Type="string" SqlType="nvarchar(1024)" />
-    <Property Name="ModeratorMessage" Type="string" SqlType="nvarchar(1024)" />
+	<!-- Nullable because I don't care -->
+    <Property Name="MinimumPunishmentTypeID" Type="byte?" SqlType="TINYINT" IsNullable="true" />
+    <Property Name="MaximumPunishmentTypeID" Type="byte?" SqlType="TINYINT" IsNullable="true" />
+    <Property Name="AutoReviewThreshhold" Type="double?" SqlType="float" IsNullable="true" />
     <Property Name="Created" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadOnly="true" />
     <Property Name="Updated" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadOnly="true" />
   </Properties>
@@ -23,17 +25,17 @@
 		</Parameters>
 	</Procedure>
 	
-	<!-- Gets the PunishmentReasonType with the given Value -->
+	<!-- Gets the AbuseType with the given Value -->
 	<Procedure Type="Get">
 		<Parameters>
 			<Parameter Name="Value" />
 		</Parameters>
 	</Procedure>
 	
-	<!-- Gets PunishmentReasonType IDs -->
+	<!-- Gets AbuseType IDs -->
 	<Procedure Type="GetPaged" />
 	
-	<!-- Gets a total count of all PunishmentReasonTypes in the table -->
+	<!-- Gets a total count of all AbuseTypes in the table -->
 	<Procedure Type="GetCount" />
 	
 	<!-- Inserts the entity into the table -->

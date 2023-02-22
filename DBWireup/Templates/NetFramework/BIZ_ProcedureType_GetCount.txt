@@ -1,4 +1,4 @@
-﻿~ACCESSIBILITY~ static ~IDTYPE~ ~PROCEDUREMETHOD~(~PARAMETERS~)
+﻿~ACCESSIBILITY~ static ~COUNTTYPE~ ~PROCEDUREMETHOD~(~PARAMETERS~)
 {
     return EntityHelper.GetEntityCount<~COUNTTYPE~>(
         EntityCacheInfo,

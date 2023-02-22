@@ -2,11 +2,11 @@
 <Entity Name="PunishmentType" Namespace="Roblox.Moderation">
   <Properties>
   	<Property Name="ID" Type="byte" SqlType="TINYINT" IsPrimaryKey="true" IsReadOnly="true" />
-    <Property Name="Value" Type="string" SqlType="nvarchar(32)" />
+    <Property Name="Value" Type="string" SqlType="varchar(32)" />
     <Property Name="AccountStatusID" Type="byte" SqlType="TinyInt" />
     <Property Name="DurationInDays" Type="byte?" SqlType="TinyInt" IsNullable="true" />
     <Property Name="SortOrder" Type="byte" SqlType="TinyInt" />
-    <Property Name="IconName" Type="string" SqlType="nvarchar(32)" />
+    <Property Name="IconName" Type="string" SqlType="varchar(32)" />
     <Property Name="Created" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadOnly="true" />
     <Property Name="Updated" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadOnly="true" />
   </Properties>

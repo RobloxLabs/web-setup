@@ -7,6 +7,6 @@
 
     using (var database = new GuardedDatabase(~CONNECTIONSTRING~))
     {
-        _ID = database.Insert<~IDTYPE~>("[dbo].[~PROCEDURE~]", queryParameters: queryParameters.ToArray());
+        ID = database.Insert<~IDTYPE~>("[dbo].[~PROCEDURE~]", queryParameters: queryParameters.ToArray());
     }
 }

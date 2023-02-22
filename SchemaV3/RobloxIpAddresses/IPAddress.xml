@@ -1,13 +1,16 @@
 <?xml version="1.0"?>
-<Entity Name="PunishmentReasonType" Namespace="Roblox.Moderation">
+<Entity Name="IPAddress">
+  <!-- The properties of the entity -->
   <Properties>
-  	<Property Name="ID" Type="byte" SqlType="TINYINT" IsPrimaryKey="true" IsReadOnly="true" />
-    <Property Name="Value" Type="string" SqlType="varchar(32)" />
-    <Property Name="Comment" Type="string" SqlType="nvarchar(1024)" />
-    <Property Name="ModeratorMessage" Type="string" SqlType="nvarchar(1024)" />
+	<Property Name="ID" Type="int" SqlType="INT" IsPrimaryKey="true" IsReadOnly="true" />
+    <Property Name="Value" Type="int" SqlType="INT" />
+    <Property Name="State" Type="bool" SqlType="BIT" />
+    <Property Name="Expiration" Type="DateTime?" SqlType="DateTime" IsNullable="true" />
     <Property Name="Created" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadOnly="true" />
     <Property Name="Updated" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadOnly="true" />
   </Properties>
+  
+  <!-- The SQL procedures for the entity -->
   <Procedures>
 	<!-- Deletes the entity with the given ID -->
 	<Procedure Type="Delete">
@@ -23,18 +26,26 @@
 		</Parameters>
 	</Procedure>
 	
-	<!-- Gets the PunishmentReasonType with the given Value -->
+	<!-- Gets the entities with the given IDs -->
+	<!--Procedure Type="MultiGet">
+		<Parameters>
+			<Parameter Name="ID" />
+		</Parameters>
+	</Procedure-->
+	
+	<!-- Gets the entity with the given Value -->
 	<Procedure Type="Get">
 		<Parameters>
 			<Parameter Name="Value" />
 		</Parameters>
 	</Procedure>
 	
-	<!-- Gets PunishmentReasonType IDs -->
-	<Procedure Type="GetPaged" />
-	
-	<!-- Gets a total count of all PunishmentReasonTypes in the table -->
-	<Procedure Type="GetCount" />
+	<!-- Gets or Creates the entity with the given Value -->
+	<Procedure Type="GetOrCreate">
+		<Parameters>
+			<Parameter Name="Value" />
+		</Parameters>
+	</Procedure>
 	
 	<!-- Inserts the entity into the table -->
 	<Procedure Type="Insert" />

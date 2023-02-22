@@ -9,6 +9,6 @@
 
     using (var database = new GuardedDatabase(~CONNECTIONSTRING~))
     {
-        database.Delete("[dbo].[~PROCEDURE~]", _ID);
+        database.Delete("[dbo].[~PROCEDURE~]", ID);
     }
 }

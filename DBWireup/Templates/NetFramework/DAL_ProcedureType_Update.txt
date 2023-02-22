@@ -9,6 +9,6 @@
 
     using (var database = new GuardedDatabase(~CONNECTIONSTRING~))
     {
-        database.Update("[dbo].[~PROCEDURE~]", _ID, queryParameters: queryParameters.ToArray());
+        database.Update("[dbo].[~PROCEDURE~]", ID, queryParameters: queryParameters.ToArray());
     }
 }

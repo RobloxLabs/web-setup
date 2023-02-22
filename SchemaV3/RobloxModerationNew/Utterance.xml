@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<!--
+	An Utterance for moderation.
+-->
+<Entity Name="Utterance" Namespace="Roblox.Moderation">
+  <Properties>
+  	<Property Name="ID" Type="long" SqlType="BIGINT" IsPrimaryKey="true" IsReadOnly="true" />
+    <Property Name="ExpressionID" Type="long" SqlType="BIGINT" />
+    <Property Name="UttererID" Type="long" SqlType="BIGINT" />
+    <Property Name="UtteranceSourceTypeID" Type="byte" SqlType="TINYINT" />
+    <Property Name="UtteranceSourceObjectID" Type="long" SqlType="BIGINT" />
+    <Property Name="Created" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadOnly="true" />
+    <Property Name="Updated" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadOnly="true" />
+  </Properties>
+  <Procedures>
+	<!-- Deletes the entity with the given ID -->
+	<Procedure Type="Delete">
+		<Parameters>
+			<Parameter Name="ID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Gets the entity with the given ID -->
+	<Procedure Type="Get">
+		<Parameters>
+			<Parameter Name="ID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Gets the Utterance with the given GUID -->
+	<!--Procedure Type="Get">
+		<Parameters>
+			<Parameter Name="GUID" />
+		</Parameters>
+	</Procedure-->
+	
+	<!-- Gets the Utterance with the given parameters -->
+	<Procedure Type="Get">
+		<Parameters>
+			<Parameter Name="ExpressionID" />
+			<Parameter Name="UttererID" />
+			<Parameter Name="UtteranceSourceTypeID" />
+			<Parameter Name="UtteranceSourceObjectID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Gets or creates the Utterance with the given parameters -->
+	<Procedure Type="GetOrCreate">
+		<Parameters>
+			<Parameter Name="ExpressionID" />
+			<Parameter Name="UttererID" />
+			<Parameter Name="UtteranceSourceTypeID" />
+			<Parameter Name="UtteranceSourceObjectID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Gets the Utterances with the given parameters -->
+	<Procedure Type="GetPaged">
+		<Parameters>
+			<Parameter Name="UtteranceSourceObjectID" />
+			<Parameter Name="UtteranceSourceTypeID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Inserts the entity into the table -->
+	<Procedure Type="Insert" />
+	
+	<!-- Updates the entity with the given ID -->
+	<Procedure Type="Update">
+		<Parameters>
+			<Parameter Name="ID" />
+		</Parameters>
+	</Procedure>
+	
+  </Procedures>
+</Entity>

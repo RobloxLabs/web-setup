@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using Roblox.Common;
-using Roblox.Common.Persistence;
 using Roblox.Mssql;
 using Roblox.Entities.Mssql;
 using Roblox.DataV2.Core;
@@ -19,8 +17,6 @@ namespace ~NAMESPACE~
     [Serializable]
     ~ACCESSIBILITY~ class ~DALCLASSNAME~
     {
-        ~DALFIELDS~
-
         ~DALPROPERTIES~
 
         private static string ~CONNECTIONSTRING~

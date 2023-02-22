@@ -1,8 +1,14 @@
 <?xml version="1.0"?>
-<Entity Name="File" Namespace="Roblox.Files.Entities" >
+<!--
+	Contains bits of text along with their MD5 hash for easy indexing/comparison.
+	Primarily stored for moderation purposes.
+-->
+<Entity Name="Expression" Namespace="Roblox.Moderation">
   <Properties>
-	<Property Name="ID" Type="long" SqlType="BIGINT" IsPrimaryKey="true" IsReadOnly="true" />
-    <Property Name="MD5Hash" Type="string" SqlType="binary(16)" />
+  	<Property Name="ID" Type="long" SqlType="BIGINT" IsPrimaryKey="true" IsReadOnly="true" />
+	<!-- Doing MD5 hash for now -->
+    <Property Name="Hash" Type="string" SqlType="binary(16)" />
+    <Property Name="Value" Type="string" SqlType="nvarchar(1000)" />
     <Property Name="Created" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadOnly="true" />
     <Property Name="Updated" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadOnly="true" />
   </Properties>
@@ -18,6 +24,21 @@
 	<Procedure Type="Get">
 		<Parameters>
 			<Parameter Name="ID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Gets the Expression with the given Hash -->
+	<Procedure Type="Get">
+		<Parameters>
+			<Parameter Name="Hash" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Gets or creates the Expression with the given Hash and Value -->
+	<Procedure Type="GetOrCreate">
+		<Parameters>
+			<Parameter Name="Hash" />
+			<Parameter Name="Value" />
 		</Parameters>
 	</Procedure>
 	

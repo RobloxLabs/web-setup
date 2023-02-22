@@ -217,7 +217,7 @@ namespace DBWireup
         /// <param name="entity"></param>
         internal static string FillDalTemplate(Entity entity, string connectionStringValue)
         {
-            IList<string> dalFields = new List<string>();
+            //IList<string> dalFields = new List<string>();
             IList<string> dalProperties = new List<string>();
             IList<string> readerParameters = new List<string>();
             IList<string> paramFunctions = new List<string>();
@@ -230,21 +230,24 @@ namespace DBWireup
             foreach (Property property in entity.Properties)
             {
                 string typeDefault = GetDefaultForType(property.Type);
+                string accessModifier = entity.IsInternal ? "internal" : "public";
 
-                dalFields.Add($"private {property.Type} _{property.Name} = {typeDefault};");
-                dalProperties.Add($"{(entity.IsInternal ? "internal" : "public")} {property.Type} {property.Name}" + LINE_PREFIX_2 +
+                /*dalFields.Add($"private {property.Type} _{property.Name} = {typeDefault};");
+                dalProperties.Add($"{accessModifier} {property.Type} {property.Name}" + LINE_PREFIX_2 +
                                     $"{{\r\n" +
                                     $"    get {{ return _{property.Name}; }}" + LINE_PREFIX_2 +
                                     $"    set {{ _{property.Name} = value; }}" + LINE_PREFIX_2 +
                                     $"}}"
-                );
+                );*/
+                // Cut it the fuck down, we don't need all this
+                dalProperties.Add($"{accessModifier} {property.Type} {property.Name} {{ get; set; }} = {typeDefault};");
 
                 if (property.IsNullable)
                     readerParameters.Add($"dal.{property.Name} = (reader[\"{property.Name}\"] != DBNull.Value ? ({property.Type})reader[\"{property.Name}\"] : null);");
                 else
                     readerParameters.Add($"dal.{property.Name} = ({property.Type})reader[\"{property.Name}\"];");
                 if (!property.IsPrimaryKey)
-                    insertUpdateQueryParameters.Add($"new SqlParameter(\"{PARAM_PREFIX}{property.Name}\", _{property.Name})");
+                    insertUpdateQueryParameters.Add($"new SqlParameter(\"{PARAM_PREFIX}{property.Name}\", {property.Name})");
             }
 
             // DAL Procedure templates //
@@ -269,7 +272,7 @@ namespace DBWireup
                     if ((int)procedure.Type >= (int)ProcedureType.Get)
                         val = argName;
                     else
-                        val = $"_{ param.Name}";
+                        val = param.Name;
 
                     parameterValidation.Add($"if ({val} == {GetDefaultForType(type)}){LINE_PREFIX_2 + "\t"}throw new ApplicationException(\"Required value not specified: {param.Name}.\");");
                     queryParameters.Add($"new SqlParameter(\"{PARAM_PREFIX}{param.Name}\", {val})");
@@ -301,7 +304,7 @@ namespace DBWireup
             template.Add("CONNECTIONSTRING", connectionStringPropName);
             template.Add("CONNECTIONSTRINGVALUE", connectionStringValue);
             template.Add("IDSQLDBTYPE", entity.GetIDProperty().SqlType);
-            template.Add("DALFIELDS", string.Join(LINE_PREFIX_2, dalFields));
+            //template.Add("DALFIELDS", string.Join(LINE_PREFIX_2, dalFields));
             template.Add("DALPROPERTIES", string.Join(LINE_PREFIX_2, dalProperties));
             template.Add("READERPARAMETERS", string.Join(LINE_PREFIX_2, readerParameters));
             template.Add("PARAMFUNCTIONS", string.Join(LINE_PREFIX_2, paramFunctions));

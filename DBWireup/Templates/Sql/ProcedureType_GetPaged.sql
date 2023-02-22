@@ -18,10 +18,15 @@ AS
 
 SET NOCOUNT ON
 
+/* Anything less causes a logic error with @Offset */
+IF (@StartRowIndex > 0)
+BEGIN
+    SET @StartRowIndex = @StartRowIndex - 1;
+END
 
-DECLARE @Offset [int] = (@StartRowIndex-1)*@MaximumRows
+DECLARE @Offset [int] = @StartRowIndex*@MaximumRows
 
-IF (@Offset < 1)
+IF (@Offset < 0)
 BEGIN
     SET @Offset = 0;
 END

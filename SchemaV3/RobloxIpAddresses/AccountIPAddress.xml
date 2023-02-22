@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<Entity Name="AccountIPAddress">
+  <!-- The properties of the entity -->
+  <Properties>
+	<Property Name="ID" Type="long" SqlType="BIGINT" IsPrimaryKey="true" IsReadOnly="true" />
+    <Property Name="AccountID" Type="int" SqlType="INT" />
+    <Property Name="IPAddressID" Type="long" SqlType="BIGINT" />
+    <Property Name="Created" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadOnly="true" />
+    <Property Name="Updated" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadOnly="true" />
+  </Properties>
+  
+  <!-- The SQL procedures for the entity -->
+  <Procedures>
+	<!-- Deletes the entity with the given ID -->
+	<Procedure Type="Delete">
+		<Parameters>
+			<Parameter Name="ID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Gets the entity with the given ID -->
+	<Procedure Type="Get">
+		<Parameters>
+			<Parameter Name="ID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Inserts the entity into the table -->
+	<Procedure Type="Insert" />
+	
+	<!-- Updates the entity with the given ID -->
+	<Procedure Type="Update">
+		<Parameters>
+			<Parameter Name="ID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Gets the AccountIPAddress for the given AccountID with the given IPAddressID -->
+	<Procedure Type="Get">
+		<Parameters>
+			<Parameter Name="AccountID" />
+			<Parameter Name="IPAddressID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Gets all AccountIPAddress IDs by AccountID -->
+	<Procedure Type="GetPaged">
+		<Parameters>
+			<Parameter Name="AccountID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Gets all AccountIPAddress IDs by IPAddressID -->
+	<Procedure Type="GetPaged">
+		<Parameters>
+			<Parameter Name="IPAddressID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Gets a count of all AccountIPAddresses in the table by AccountID -->
+	<Procedure Type="GetCount">
+		<Parameters>
+			<Parameter Name="AccountID" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Gets a count of all AccountIPAddresses in the table by IPAddressID -->
+	<Procedure Type="GetCount">
+		<Parameters>
+			<Parameter Name="IPAddressID" />
+		</Parameters>
+	</Procedure>
+	
+  </Procedures>
+</Entity>

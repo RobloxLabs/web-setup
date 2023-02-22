@@ -1,8 +1,12 @@
 <?xml version="1.0"?>
-<Entity Name="File" Namespace="Roblox.Files.Entities" >
+<!--
+	This is an example of how a data-bound enum should be set up.
+	Other examples include AssetType, CreatorType, PunishmentType, AccountStatusType, etc.
+	-->
+<Entity Name="TypeEntity" Namespace="Roblox.Entities.Examples">
   <Properties>
-	<Property Name="ID" Type="long" SqlType="BIGINT" IsPrimaryKey="true" IsReadOnly="true" />
-    <Property Name="MD5Hash" Type="string" SqlType="binary(16)" />
+  	<Property Name="ID" Type="byte" SqlType="TINYINT" IsPrimaryKey="true" IsReadOnly="true" />
+    <Property Name="Value" Type="string" SqlType="nvarchar(32)" />
     <Property Name="Created" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadOnly="true" />
     <Property Name="Updated" Type="DateTime" SqlType="DateTime" Default="getdate()" IsReadOnly="true" />
   </Properties>
@@ -20,6 +24,19 @@
 			<Parameter Name="ID" />
 		</Parameters>
 	</Procedure>
+	
+	<!-- Gets the TypeEntity with the given Value -->
+	<Procedure Type="Get">
+		<Parameters>
+			<Parameter Name="Value" />
+		</Parameters>
+	</Procedure>
+	
+	<!-- Gets a page of TypeEntity IDs -->
+	<Procedure Type="GetPaged" />
+	
+	<!-- Gets a total count of all the entities in the table -->
+	<Procedure Type="GetCount" />
 	
 	<!-- Inserts the entity into the table -->
 	<Procedure Type="Insert" />
